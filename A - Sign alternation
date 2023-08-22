@@ -1,0 +1,96 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+int a[100005],tree[4*100000]; 
+
+void build(int id, int l, int r){
+    if(l == r){
+        if(l%2==0){
+            tree[id] = -a[l];
+        }
+        else{
+            tree[id] = a[l];
+        }
+        return;
+    }   
+
+    int mid = l+r >> 1;
+    build(2*id,l,mid);
+    build(2*id+1,mid+1,r);
+
+    tree[id] = tree[2*id] + tree[2*id+1];
+}
+
+void update(int id, int l, int r, int i, int val){
+    if(i < l || i > r){
+        return;
+    }
+
+    if(l == r){
+        if(l%2==0){
+            tree[id] = -val;
+        }
+        else{
+            tree[id] = val;
+        }
+        return;
+    }
+
+    int mid = (l+r)/2; 
+    update(2 * id,l,mid,i,val);
+    update(2 * id + 1,mid+1,r,i,val);
+
+    tree[id] = tree[2 * id] + tree[id * 2 + 1];
+}
+
+int get(int id, int l, int r, int u, int v){
+    if(v < l || u > r){
+        return 0;
+    }
+    if(l >= u && r <= v){
+        return tree[id];
+    }
+    int mid = l+r >> 1;
+    int g1 = get(2*id,l,mid,u,v);
+    int g2 = get(2*id+1,mid+1,r,u,v);
+
+    return g1 + g2;
+}
+
+int main() {
+    ios_base::sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
+
+    // freopen("P4S1.inp","r",stdin);
+    // freopen("P4S1.out","w",stdout);
+
+    int n,m,task,x,y;
+
+    cin>>n;
+
+    for(int i=1;i<=n;i++){
+        cin>>a[i];
+    }
+
+    build(1,1,n);
+
+    cin>>m;
+
+    while(m--){
+        cin>>task>>x>>y;
+        if(task){
+            if(x % 2 == 0){
+                cout<<-get(1,1,n,x,y)<<endl;
+            }
+            else{
+                cout<<get(1,1,n,x,y)<<endl;
+            }
+        }
+        else{
+            update(1,1,n,x,y);
+        }
+    }
+
+    return 0;
+}
