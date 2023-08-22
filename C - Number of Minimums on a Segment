@@ -1,0 +1,117 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+int a[100005];
+pair<long long,int> tree[4*100000];
+
+void build(int id, int l, int r){
+    if(l == r){
+        tree[id] = {a[l],1};
+        return;
+    }
+
+    int mid = (l+r) >> 1;
+    build(2*id,l,mid);
+    build(2*id+1,mid+1,r);
+
+    tree[id].first = min(tree[2*id].first,tree[2*id+1].first);
+    if(tree[2*id].first == tree[2*id+1].first){
+        tree[id].second = tree[2*id].second + tree[2*id+1].second;
+    }
+    else if(tree[2*id].first < tree[2*id+1].first){
+        tree[id].second = tree[2*id].second;
+    }
+    else{
+        tree[id].second = tree[2*id+1].second;
+    }
+
+}
+
+void update(int id,int l,int r,int i, int val){
+    if(i < l || i > r){
+        return;
+    }
+    if(l == r){
+        tree[id] = {val,1};
+        return;
+    }
+
+    int mid = (l+r) >> 1;
+    update(id*2,l,mid,i,val);
+    update(id*2+1,mid+1,r,i,val);
+
+    tree[id].first = min(tree[2*id].first,tree[2*id+1].first);
+    if(tree[2*id].first == tree[2*id+1].first){
+        tree[id].second = tree[2*id].second + tree[2*id+1].second;
+    }
+    else if(tree[2*id].first < tree[2*id+1].first){
+        tree[id].second = tree[2*id].second;
+    }
+    else{
+        tree[id].second = tree[2*id+1].second;
+    }
+
+}
+
+pair<long long,int> get(int id, int l, int r, int u, int v){
+
+    if(v < l || u > r){
+        return {INT_MAX,0};
+    }
+    
+    //* range found
+    if(l >= u && r <= v){
+        return tree[id];
+    }
+
+    int mid = (l+r) >> 1;
+    pair<long long,int> get1 = get(2 * id, l , mid, u, v); 
+    pair<long long,int> get2 = get(2 * id + 1, mid + 1 , r, u, v); 
+
+    if(get1.first == get2.first){
+        return {get1.first,get1.second + get2.second};
+    }
+    else if(get1.first < get2.first){
+        return get1;
+    }
+    else{
+        return get2;
+    }
+
+}
+
+int main() {
+    ios_base::sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
+
+    // freopen("P1S3.inp","r",stdin);
+    // freopen("P1S3.out","w",stdout);
+
+    int n,q,task,x,y;
+
+    //TODO_1 : set index i to v
+    //TODO_2 : calculate the minimum and number of minimum
+
+    cin>>n>>q;
+
+    for(int i=1;i<=n;i++){
+        cin>>a[i];
+    }
+
+    build(1,1,n);
+
+    while(q--){
+        cin>>task>>x>>y;
+        x++;    
+        if(task == 1){
+            update(1,1,n,x,y);
+        }
+        else{
+            pair<long long,int> p = get(1,1,n,x,y);
+            cout<<p.first<<' '<<p.second<<endl;
+        }
+    }
+
+    return 0;
+}
