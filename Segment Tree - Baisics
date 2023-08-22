@@ -1,0 +1,107 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+int tree[4*100005],a[100005];
+
+//^ building ST
+void build(int id, int l, int r){
+    //* put value in place
+    if(l == r){
+        tree[id] = a[l];
+        return;
+    }
+
+    //* recursively built ST
+    int mid = (l+r)/2;
+    build(2 * id, l, mid);
+    build(2 * id + 1,mid +1 , r);
+
+    //* update the min element for each node
+    tree[id] = max(tree[2 * id],tree[2 * id + 1]);
+}
+
+//^ update value in ST
+//^ insert val into pos i
+//TODO_2
+void update(int id, int l, int r, int i, int val){
+
+    //* out of range
+    if(i < l || i > r){
+        return;
+    }
+
+    //* position found
+    if(l == r){
+        tree[id] = val;
+        return; 
+    }
+
+    //* recursively find position i
+    int mid = (l+r)/2;
+    update(2 * id, l, mid, i, val);
+    update(2 * id + 1, mid +1, r, i, val);
+
+    //* keep updating min value for each node
+    tree[id] = max(tree[2 * id] , tree[2 * id + 1]);
+}
+
+//TODO_2
+
+int get(int id, int l, int r, int u, int v){
+
+    //* out of range
+    if(v < l || u > r){
+        return INT_MIN;
+    }
+    
+    //* range found
+    if(l >= u && r <= v){
+        return tree[id]; //* return min value in range [u, v] 
+    }
+
+    //* recursively find min in rage [u,v]
+    int mid = (l+r)/2;
+    int get1 = get(2 * id, l , mid, u, v); 
+    int get2 = get(2 * id + 1, mid + 1 , r, u, v); 
+
+    return max(get1 , get2);
+}
+
+int main() {
+    ios_base::sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
+
+    freopen("ST.inp","r",stdin);
+    freopen("ST.out","w",stdout);
+
+    //TODO_1 : Append value x into place y
+    //TODO_2 : Find min value in range [l,r];
+
+    int n,task,x,y,q;
+
+    cin>>n;
+
+    for(int i=1;i<=n;i++){
+        cin>>a[i];
+    }
+
+    build(1,1,n);
+
+    cin>>q;
+
+    while(q--){
+        cin>>task>>x>>y;
+        if(task == 1){  //TODO 1
+            update(1,1,n,x,y);
+        }
+        else{ // TODO_2
+            cout<<get(1,1,n,x,y)<<endl;
+        }
+    }
+
+    return 0;
+}
+
+
+
