@@ -1,0 +1,62 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+long long tree[4*100000];
+
+void update(int id, int l, int r, int i,int val){
+    if(i < l || i > r){
+        return;
+    }
+    if(l == r){
+        tree[id] += val;
+        return;
+    }
+    int mid = l+r >> 1;
+    update(2*id,l,mid,i,val);
+    update(2*id+1,mid+1,r,i,val);
+
+    tree[id] = tree[2*id] + tree[2*id+1];
+}
+
+long long get(int id, int l, int r, int u, int v){
+    if(v < l || u > r){
+        return 0;
+    }
+    if(l >= u && r <= v){
+        return tree[id];
+    }
+
+    int mid = l+r >> 1;
+    int g1 = get(2*id,l,mid,u,v);
+    int g2 = get(2*id+1,mid+1,r,u,v);
+
+    return g1 + g2;
+}
+
+int main() {
+    ios_base::sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
+
+    // freopen("P5S1.inp","r",stdin);   
+    // freopen("P5S1.out","w",stdout);
+
+    int n,m,task,l,r,v;
+
+    cin>>n>>m;  
+
+    while(m--){
+        cin>>task;
+        if(task == 1){
+            cin>>l>>r>>v;
+            update(1,1,n,l+1,v);
+            update(1,1,n,r+1,-v);
+        }
+        else{
+            cin>>v;
+            cout<<get(1,1,n,1,v+1)<<endl;
+        }
+    }
+
+    return 0;
+}
