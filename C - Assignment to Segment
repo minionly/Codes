@@ -1,0 +1,98 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+int tree[4*100000], a[100000];
+pair<int,int> lazy[4*100000];
+
+void propagate(int id, int l, int r){
+    if(lazy[id].first == -1){
+        return;
+    }
+
+    tree[id] = lazy[id].first;
+    if(l != r){
+        if(lazy[2*id].second < lazy[id].second){
+            lazy[2*id] = lazy[id];
+        }
+        if(lazy[2*id+1].second < lazy[id].second){
+            lazy[2*id+1] = lazy[id];
+        }
+    }
+    lazy[id] = {-1,0};
+}
+
+void update(int id, int l, int r, int u, int v, int val, int ind){
+    propagate(id,l,r);
+
+    if(r < u || l > v){
+        return;
+    }
+    if(u <= l && r <= v){
+        lazy[id] = {val,ind};
+        propagate(id,l,r);
+        return;
+    }
+    int mid = l+r >> 1;
+    update(2*id,l,mid,u,v,val,ind);
+    update(2*id+1,mid+1,r,u,v,val,ind);
+}
+
+long long get(int id, int l, int r, int i){
+    propagate(id,l,r);
+    if(l == r){
+        return tree[id];
+    }
+    int mid = l+r >> 1;
+    if(i <= mid){
+        return get(2*id,l,mid,i);
+    }
+    return get(2*id+1,mid+1,r,i);
+}
+
+int main() {
+    ios_base::sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
+
+    int n,m,ind=1;
+    cin>>n>>m;
+
+    fill(lazy,lazy+100000,make_pair(-1,0));
+
+    while(m--){     
+        int task;
+        cin>>task;
+        if(task == 1){
+            int l,r,v;
+            cin>>l>>r>>v;
+            l++;
+            update(1,1,n,l,r,v,ind++);
+        }
+        else{
+            int i;
+            cin>>i;
+            i++;
+            cout<<get(1,1,n,i)<<endl;
+        }
+    }
+
+    return 0;
+}
+/**
+⠀⠀⠀⠀⠀⠀⠀⠀ ⠀⠀⠀⣠⣴⣶⣿⣿⣷⣶⣄⣀⣀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀ ⠀⠀⣰⣾⣿⣿⡿⢿⣿⣿⣿⣿⣿⣿⣿⣷⣦⡀⠀⠀
+⠀⠀⠀⠀⠀⠀ ⠀⢀⣾⣿⣿⡟⠁⣰⣿⣿⣿⡿⠿⠻⠿⣿⣿⣿⣿⣧
+⠀⠀⠀⠀⠀ ⠀⠀⣾⣿⣿⠏⠀⣴⣿⣿⣿⠉⠀⠀⠀⠀⠀⠈⢻⣿⣿⣇
+⠀⠀⠀⠀  ⣠⣼⣿⣿⡏⠀⢠⣿⣿⣿⠇⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿⣿⡀
+⠀⠀⠀ ⣰⣿⣿⣿⣿⣿⡇⠀⢸⣿⣿⣿⡀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⡇
+⠀⠀ ⢰⣿⣿⡿⣿⣿⣿⡇⠀⠘⣿⣿⣿⣧⠀⠀⠀⠀⠀⠀⢀⣸⣿⣿⣿⠁
+⠀  ⣿⣿⣿⠁⣿⣿⣿⡇⠀⠀⠻⣿⣿⣿⣷⣶⣶⣶⣶⣶⣿⣿⣿⣿⠃
+  ⢰⣿⣿⡇⠀⣿⣿⣿⠀⠀⠀⠀⠈⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠁⠀
+  ⢸⣿⣿⡇⠀⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠉⠛⠛⠛⠉⢉⣿⣿⠀⠀⠀⠀
+  ⢸⣿⣿⣇⠀⣿⣿⣿⠀⠀⠀⠀⠀⢀⣤⣤⣤⡀⠀⠀⢸⣿⣿⣿⣷⣦⠀
+   ⢻⣿⣿⣶⣿⣿⣿⠀⠀⠀⠀⠀⠈⠻⣿⣿⣿⣦⡀⠀⠉⠉⠻⣿⣿⡇
+     ⠛⠿⣿⣿⣿⣿⣷⣤⡀⠀⠀⠀⠀⠈⠹⣿⣿⣇⣀ ⣠⣾⣿⣿⡇
+          ⠹⣿⣿⣿⣿⣦⣤⣤⣤⣤⣾⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀
+              ⠉⠻⢿⣿⣿⣿⣿⣿⣿⠿⠋⠉⠛⠋⠉⠉⠁⠀
+⠀                 ⠈⠉⠉⠉⠁
+**/
