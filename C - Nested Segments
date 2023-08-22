@@ -1,0 +1,81 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+int a[2*100005],tree[8*100001],n;
+map<int,int> m,ma;
+
+void build(int id, int l, int r){
+    if(l == r){
+        tree[id] = 0;
+        return;
+    }
+
+    int mid = l+r >> 1;
+    build(2*id,l,mid);
+    build(2*id+1,mid+1,r);
+
+    tree[id] = tree[2*id] + tree[2*id+1];
+}
+
+void update(int id, int l, int r,int i){
+    if(i < l || i > r){
+        return;
+    }
+    if(l == r){
+        tree[id] = 1;
+        return;
+    }
+
+    int mid = l+r >> 1;
+    update(2*id,l,mid,i);
+    update(2*id+1,mid+1,r,i);
+
+    tree[id] = tree[2*id] + tree[2*id+1];
+}
+
+int get(int id, int l, int r, int u, int v){
+    if(v < l || u > r){
+        return 0;
+    }
+    if(l >= u && r <= v){
+        return tree[id];
+    }
+    int mid = l+r >> 1;
+    int g1 = get(2*id,l,mid,u,v);
+    int g2 = get(2*id+1,mid+1,r,u,v);
+
+    return g1 + g2;
+}
+
+int main() {
+    ios_base::sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
+
+    // freopen("P3S3.inp","r",stdin);
+    // freopen("P3S3.out","w",stdout);
+
+    cin>>n;
+
+    for(int i=1;i<=2*n;i++){
+        cin>>a[i];
+    }
+
+    // build(1,1,2*n);
+    
+    for(int i=1;i<=2*n;i++){
+        if(!ma[a[i]]){
+            ma[a[i]] = i;
+        }
+        else{
+            m[a[i]] = get(1,1,2*n,ma[a[i]],i);
+            update(1,1,2*n,ma[a[i]]);
+        }
+    }
+
+    for(pair<int,int> p : m){
+        cout<<p.second<<' ';
+    }
+
+    return 0;
+}
