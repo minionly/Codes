@@ -1,0 +1,111 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+
+struct node{
+    long long pre_seg, suf_seg, seg_sum, seg_max_sum;
+    static node merge(node a, node b){
+        node n;
+        n.seg_sum = a.seg_sum + b.seg_sum;
+        n.pre_seg = max(a.pre_seg, a.seg_sum + b.pre_seg);
+        n.suf_seg = max(b.suf_seg,b.seg_sum + a.suf_seg);
+        n.seg_max_sum = max(a.suf_seg + b.pre_seg, max(a.seg_max_sum,b.seg_max_sum));
+
+        return n;
+    }
+    
+    static node set(node a,long long val){
+        a.pre_seg = val;
+        a.suf_seg = val;
+        a.seg_max_sum = val;
+
+        return a;
+    }
+};
+
+pair<long long,long long> lazy[400005];
+// value, order of operation
+node tree[400005];
+
+void propagate(int id, int l, int r){
+    if(lazy[id].first == INT_MIN){
+        return;
+    }
+
+    tree[id].seg_sum = lazy[id].first * (r-l+1); //sum of whole segment
+    if(lazy[id].first < 0){
+        tree[id] = node::set(tree[id],0); //since the value is negative we dont take anything
+    }
+    else{
+        tree[id] = node::set(tree[id],tree[id].seg_sum); //since value is not negative we take everything
+    }
+    if(l != r){
+        if(lazy[2*id].second < lazy[id].second){
+            lazy[2*id] = lazy[id];
+        }
+        if(lazy[2*id+1].second < lazy[id].second){
+            lazy[2*id+1] = lazy[id];
+        }
+    }
+    lazy[id] = {INT_MIN,0};
+}
+
+void update(int id, int l, int r, int u, int v, int val, int ord){
+    propagate(id,l,r);
+    if(v < l || u > r){
+        return;
+    }
+    if(u <= l && r <= v){
+        lazy[id] = {val,ord};
+        propagate(id,l,r);
+        return;
+    }
+    int mid = l + r >> 1;
+    update(2*id,l,mid,u,v,val,ord);
+    update(2*id+1,mid+1,r,u,v,val,ord);
+
+    tree[id] = node::merge(tree[2*id],tree[2*id+1]);
+}
+
+int main() {
+    ios_base::sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
+
+    // freopen("main.inp","r",stdin);
+    // freopen("main.out","w",stdout);
+
+    int n,q,ord=1;
+
+    cin>>n>>q;
+
+    fill(lazy,lazy+400000,make_pair(INT_MIN,0));
+
+    while(q--){
+        int l,r,v;
+        cin>>l>>r>>v;
+        l++;
+        update(1,1,n,l,r,v,ord++);
+        cout<<tree[1].seg_max_sum<<endl;
+    }
+
+    return 0;
+}
+/**
+⠀⠀⠀⠀⠀⠀⠀⠀ ⠀⠀⠀⣠⣴⣶⣿⣿⣷⣶⣄⣀⣀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀ ⠀⠀⣰⣾⣿⣿⡿⢿⣿⣿⣿⣿⣿⣿⣿⣷⣦⡀⠀⠀
+⠀⠀⠀⠀⠀⠀ ⠀⢀⣾⣿⣿⡟⠁⣰⣿⣿⣿⡿⠿⠻⠿⣿⣿⣿⣿⣧
+⠀⠀⠀⠀⠀ ⠀⠀⣾⣿⣿⠏⠀⣴⣿⣿⣿⠉⠀⠀⠀⠀⠀⠈⢻⣿⣿⣇
+⠀⠀⠀⠀  ⣠⣼⣿⣿⡏⠀⢠⣿⣿⣿⠇⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿⣿⡀
+⠀⠀⠀ ⣰⣿⣿⣿⣿⣿⡇⠀⢸⣿⣿⣿⡀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⡇
+⠀⠀ ⢰⣿⣿⡿⣿⣿⣿⡇⠀⠘⣿⣿⣿⣧⠀⠀⠀⠀⠀⠀⢀⣸⣿⣿⣿⠁
+⠀  ⣿⣿⣿⠁⣿⣿⣿⡇⠀⠀⠻⣿⣿⣿⣷⣶⣶⣶⣶⣶⣿⣿⣿⣿⠃
+  ⢰⣿⣿⡇⠀⣿⣿⣿⠀⠀⠀⠀⠈⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠁⠀
+  ⢸⣿⣿⡇⠀⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠉⠛⠛⠛⠉⢉⣿⣿⠀⠀⠀⠀
+  ⢸⣿⣿⣇⠀⣿⣿⣿⠀⠀⠀⠀⠀⢀⣤⣤⣤⡀⠀⠀⢸⣿⣿⣿⣷⣦⠀
+   ⢻⣿⣿⣶⣿⣿⣿⠀⠀⠀⠀⠀⠈⠻⣿⣿⣿⣦⡀⠀⠉⠉⠻⣿⣿⡇
+     ⠛⠿⣿⣿⣿⣿⣷⣤⡀⠀⠀⠀⠀⠈⠹⣿⣿⣇⣀ ⣠⣾⣿⣿⡇
+          ⠹⣿⣿⣿⣿⣦⣤⣤⣤⣤⣾⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀
+              ⠉⠻⢿⣿⣿⣿⣿⣿⣿⠿⠋⠉⠛⠋⠉⠉⠁⠀
+⠀                 ⠈⠉⠉⠉⠁
+**/
