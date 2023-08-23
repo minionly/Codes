@@ -1,0 +1,118 @@
+/**
+Given an array of size n (n <= 2*10^5 ; a[i] <= 30) , there are two types of operations:
+Type 1: (1, i, val) --> update tree[i] = v
+Type 2: (2, l, r)   --> find the MEX* in range (l, r)
+
+MEX: Minimum, non-negative EXcluded interger
+**/
+
+#include <bits/stdc++.h>
+using namespace std;
+
+int a[200005],tree[800005];
+
+void build(int id, int l, int r){
+    if(l == r){
+        tree[id] = (1 << a[l]);
+        return;
+    }
+
+    int mid = l + r >> 1;
+    build(2*id,l,mid);
+    build(2*id+1,mid+1,r);
+
+    tree[id] = tree[2*id] | tree[2*id+1];
+}
+
+void update(int id, int l, int r, int i, int val){
+    if(i < l || i > r){
+        return;
+    }
+    if(l == r){
+        tree[id] = (1 << val);
+        return;
+    }
+    
+    int mid = l + r >> 1;
+    update(2*id,l,mid,i,val);
+    update(2*id+1,mid+1,r,i,val);
+
+    tree[id] = tree[2*id] | tree[2*id+1];
+}
+
+int get(int id, int l, int r, int u, int v){
+    if(v < l || u > r){
+        return  0;
+    }
+    if(u <= l && r <= v){
+        return tree[id];
+    }
+    int mid = l + r >> 1;
+    return (get(2*id,l,mid,u,v) | get(2*id+1,mid+1,r,u,v));
+}
+
+int get_MEX(int val){
+    for(int i = 0;i < 31;i++){
+        if((val & (1 << i)) == 0){
+            return i;
+        }
+    }
+    return 31;
+}
+
+int main() {
+    ios_base::sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
+
+    freopen("main.inp","r",stdin);
+    freopen("main.out","w",stdout);
+
+    int n,q;
+
+    cin>>n;
+
+    for(int i=1;i<=n;i++){
+        cin>>a[i];
+    }
+
+    build(1,1,n);
+
+    cin>>q;
+
+    while(q--){
+        int task;
+        cin>>task;
+        if(task == 1){
+            int i,v;
+            cin>>i>>v;
+            update(1,1,n,i,v);
+        }
+        else{
+            int l,r;
+            cin>>l>>r;
+            int mask = get(1,1,n,l,r);
+            cout<<get_MEX(mask)<<endl;
+        }
+    }
+
+    return 0;
+}
+/**
+⠀⠀⠀⠀⠀⠀⠀⠀ ⠀⠀⠀⣠⣴⣶⣿⣿⣷⣶⣄⣀⣀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀ ⠀⠀⣰⣾⣿⣿⡿⢿⣿⣿⣿⣿⣿⣿⣿⣷⣦⡀⠀⠀
+⠀⠀⠀⠀⠀⠀ ⠀⢀⣾⣿⣿⡟⠁⣰⣿⣿⣿⡿⠿⠻⠿⣿⣿⣿⣿⣧
+⠀⠀⠀⠀⠀ ⠀⠀⣾⣿⣿⠏⠀⣴⣿⣿⣿⠉⠀⠀⠀⠀⠀⠈⢻⣿⣿⣇
+⠀⠀⠀⠀  ⣠⣼⣿⣿⡏⠀⢠⣿⣿⣿⠇⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿⣿⡀
+⠀⠀⠀ ⣰⣿⣿⣿⣿⣿⡇⠀⢸⣿⣿⣿⡀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⡇
+⠀⠀ ⢰⣿⣿⡿⣿⣿⣿⡇⠀⠘⣿⣿⣿⣧⠀⠀⠀⠀⠀⠀⢀⣸⣿⣿⣿⠁
+⠀  ⣿⣿⣿⠁⣿⣿⣿⡇⠀⠀⠻⣿⣿⣿⣷⣶⣶⣶⣶⣶⣿⣿⣿⣿⠃
+  ⢰⣿⣿⡇⠀⣿⣿⣿⠀⠀⠀⠀⠈⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠁⠀
+  ⢸⣿⣿⡇⠀⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠉⠛⠛⠛⠉⢉⣿⣿⠀⠀⠀⠀
+  ⢸⣿⣿⣇⠀⣿⣿⣿⠀⠀⠀⠀⠀⢀⣤⣤⣤⡀⠀⠀⢸⣿⣿⣿⣷⣦⠀
+   ⢻⣿⣿⣶⣿⣿⣿⠀⠀⠀⠀⠀⠈⠻⣿⣿⣿⣦⡀⠀⠉⠉⠻⣿⣿⡇
+     ⠛⠿⣿⣿⣿⣿⣷⣤⡀⠀⠀⠀⠀⠈⠹⣿⣿⣇⣀ ⣠⣾⣿⣿⡇
+          ⠹⣿⣿⣿⣿⣦⣤⣤⣤⣤⣾⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀
+              ⠉⠻⢿⣿⣿⣿⣿⣿⣿⠿⠋⠉⠛⠋⠉⠉⠁⠀
+⠀                 ⠈⠉⠉⠉⠁
+**/
