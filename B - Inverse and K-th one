@@ -1,0 +1,109 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+int tree[400005];
+pair<int,int> lazy[400005];
+
+void propagate(int id, int l, int r){
+    if(lazy[id].first == 0){
+        return;
+    }
+    //if the amount of changes made to this segment is odd
+    if(lazy[id].first & 1){
+        tree[id] = (r - l + 1) - tree[id];
+    }
+    if(l != r){
+        if(lazy[2*id].second < lazy[id].second){
+            lazy[2*id].first += lazy[id].first;
+            lazy[2*id].second = lazy[id].second;
+        }
+        if(lazy[2*id+1].second < lazy[id].second){
+            lazy[2*id+1].first += lazy[id].first;
+            lazy[2*id+1].second = lazy[id].second;
+        }
+    }
+    lazy[id] = {0,0};
+}
+
+void update(int id, int l, int r, int u, int v, int ord){
+    propagate(id,l,r);
+    if(v < l || u > r){
+        return;
+    }
+    if(u <= l && r <= v){
+        lazy[id].first += 1;
+        lazy[id].second = ord;
+        propagate(id,l,r);
+        return;
+    }
+    int mid = l + r >> 1;
+    update(2*id,l,mid,u,v,ord);
+    update(2*id+1,mid+1,r,u,v,ord);
+
+    tree[id] = tree[2*id] + tree[2*id+1];
+}
+
+int get(int id, int l, int r, int i){
+    propagate(id,l,r);
+    if(l == r){
+        return l-1;
+    }
+    int mid = l + r >> 1;
+    propagate(2*id,l,mid);
+    propagate(2*id+1,mid+1,r);
+    if(i < tree[2*id]){
+        return get(2*id,l,mid,i);
+    }
+    else{
+        return get(2*id+1,mid+1,r,i - tree[2*id]);
+    }
+}
+
+int main() {
+    ios_base::sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
+
+    freopen("main.inp","r",stdin);
+    freopen("main.out","w",stdout);
+
+    int n,q,ord=1;
+
+    cin>>n>>q;
+
+    while(q--){
+        int task;
+        cin>>task;
+        if(task == 1){
+            int l,r;
+            cin>>l>>r;
+            l++;
+            update(1,1,n,l,r,ord++);
+        }
+        else{
+            int k;
+            cin>>k;
+            cout<<get(1,1,n,k)<<endl;
+        }
+    }
+
+    return 0;
+}
+/**
+⠀⠀⠀⠀⠀⠀⠀⠀ ⠀⠀⠀⣠⣴⣶⣿⣿⣷⣶⣄⣀⣀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀ ⠀⠀⣰⣾⣿⣿⡿⢿⣿⣿⣿⣿⣿⣿⣿⣷⣦⡀⠀⠀
+⠀⠀⠀⠀⠀⠀ ⠀⢀⣾⣿⣿⡟⠁⣰⣿⣿⣿⡿⠿⠻⠿⣿⣿⣿⣿⣧
+⠀⠀⠀⠀⠀ ⠀⠀⣾⣿⣿⠏⠀⣴⣿⣿⣿⠉⠀⠀⠀⠀⠀⠈⢻⣿⣿⣇
+⠀⠀⠀⠀  ⣠⣼⣿⣿⡏⠀⢠⣿⣿⣿⠇⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿⣿⡀
+⠀⠀⠀ ⣰⣿⣿⣿⣿⣿⡇⠀⢸⣿⣿⣿⡀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⡇
+⠀⠀ ⢰⣿⣿⡿⣿⣿⣿⡇⠀⠘⣿⣿⣿⣧⠀⠀⠀⠀⠀⠀⢀⣸⣿⣿⣿⠁
+⠀  ⣿⣿⣿⠁⣿⣿⣿⡇⠀⠀⠻⣿⣿⣿⣷⣶⣶⣶⣶⣶⣿⣿⣿⣿⠃
+  ⢰⣿⣿⡇⠀⣿⣿⣿⠀⠀⠀⠀⠈⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠁⠀
+  ⢸⣿⣿⡇⠀⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠉⠛⠛⠛⠉⢉⣿⣿⠀⠀⠀⠀
+  ⢸⣿⣿⣇⠀⣿⣿⣿⠀⠀⠀⠀⠀⢀⣤⣤⣤⡀⠀⠀⢸⣿⣿⣿⣷⣦⠀
+   ⢻⣿⣿⣶⣿⣿⣿⠀⠀⠀⠀⠀⠈⠻⣿⣿⣿⣦⡀⠀⠉⠉⠻⣿⣿⡇
+     ⠛⠿⣿⣿⣿⣿⣷⣤⡀⠀⠀⠀⠀⠈⠹⣿⣿⣇⣀ ⣠⣾⣿⣿⡇
+          ⠹⣿⣿⣿⣿⣦⣤⣤⣤⣤⣾⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀
+              ⠉⠻⢿⣿⣿⣿⣿⣿⣿⠿⠋⠉⠛⠋⠉⠉⠁⠀
+⠀                 ⠈⠉⠉⠉⠁
+**/
