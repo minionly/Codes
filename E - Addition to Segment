@@ -1,36 +1,47 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-long long tree[4*100000];
+long long tree[4*100000],lazy[4*100000];
 
-void update(int id, int l, int r, int i,int val){
-    if(i < l || i > r){
+void propagate(int id, int l, int r){
+    if(!lazy[id]){
         return;
     }
-    if(l == r){
-        tree[id] += val;
-        return;
-    }
-    int mid = l+r >> 1;
-    update(2*id,l,mid,i,val);
-    update(2*id+1,mid+1,r,i,val);
 
-    tree[id] = tree[2*id] + tree[2*id+1];
+    tree[id] += lazy[id];
+    if(l != r){
+        lazy[2*id] += lazy[id];
+        lazy[2*id+1] += lazy[id];
+    }
+    lazy[id] = 0;
 }
 
-long long get(int id, int l, int r, int u, int v){
-    if(v < l || u > r){
-        return 0;
+void update(int id, int l, int r, int u, int v, int val){
+    propagate(id,l,r);
+
+    if(r < u || l > v){
+        return;
     }
-    if(l >= u && r <= v){
+    if(u <= l && r <= v){
+        lazy[id] += val;
+        propagate(id,l,r);
+        return;
+    }
+    int mid = l+r >> 1;
+    update(2*id,l,mid,u,v,val);
+    update(2*id+1,mid+1,r,u,v,val);
+}
+
+long long get(int id, int l, int r, int i){
+    propagate(id,l,r);
+    if(i < l || i > r){
+        return -1;
+    }
+    if(l == r){
         return tree[id];
     }
-
     int mid = l+r >> 1;
-    int g1 = get(2*id,l,mid,u,v);
-    int g2 = get(2*id+1,mid+1,r,u,v);
-
-    return g1 + g2;
+    return max(get(2*id,l,mid,i), get(2*id+1,mid+1,r,i));
 }
 
 int main() {
@@ -38,25 +49,46 @@ int main() {
     cin.tie(0);
     cout.tie(0);
 
-    // freopen("P5S1.inp","r",stdin);   
-    // freopen("P5S1.out","w",stdout);
+    // freopen("main.inp","r",stdin);
+    // freopen("main.out","w",stdout);
 
-    int n,m,task,l,r,v;
-
-    cin>>n>>m;  
+    int n,m;
+    cin>>n>>m;
 
     while(m--){
+        int task;
         cin>>task;
         if(task == 1){
+            int l,r,v;
             cin>>l>>r>>v;
-            update(1,1,n,l+1,v);
-            update(1,1,n,r+1,-v);
+            l++;
+            update(1,1,n,l,r,v);
         }
         else{
-            cin>>v;
-            cout<<get(1,1,n,1,v+1)<<endl;
+            int i;
+            cin>>i;
+            i++;
+            cout<<get(1,1,n,i)<<endl;
         }
     }
 
     return 0;
 }
+/**
+⠀⠀⠀⠀⠀⠀⠀⠀ ⠀⠀⠀⣠⣴⣶⣿⣿⣷⣶⣄⣀⣀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀ ⠀⠀⣰⣾⣿⣿⡿⢿⣿⣿⣿⣿⣿⣿⣿⣷⣦⡀⠀⠀
+⠀⠀⠀⠀⠀⠀ ⠀⢀⣾⣿⣿⡟⠁⣰⣿⣿⣿⡿⠿⠻⠿⣿⣿⣿⣿⣧
+⠀⠀⠀⠀⠀ ⠀⠀⣾⣿⣿⠏⠀⣴⣿⣿⣿⠉⠀⠀⠀⠀⠀⠈⢻⣿⣿⣇
+⠀⠀⠀⠀  ⣠⣼⣿⣿⡏⠀⢠⣿⣿⣿⠇⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿⣿⡀
+⠀⠀⠀ ⣰⣿⣿⣿⣿⣿⡇⠀⢸⣿⣿⣿⡀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⡇
+⠀⠀ ⢰⣿⣿⡿⣿⣿⣿⡇⠀⠘⣿⣿⣿⣧⠀⠀⠀⠀⠀⠀⢀⣸⣿⣿⣿⠁
+⠀  ⣿⣿⣿⠁⣿⣿⣿⡇⠀⠀⠻⣿⣿⣿⣷⣶⣶⣶⣶⣶⣿⣿⣿⣿⠃
+  ⢰⣿⣿⡇⠀⣿⣿⣿⠀⠀⠀⠀⠈⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠁⠀
+  ⢸⣿⣿⡇⠀⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠉⠛⠛⠛⠉⢉⣿⣿⠀⠀⠀⠀
+  ⢸⣿⣿⣇⠀⣿⣿⣿⠀⠀⠀⠀⠀⢀⣤⣤⣤⡀⠀⠀⢸⣿⣿⣿⣷⣦⠀
+   ⢻⣿⣿⣶⣿⣿⣿⠀⠀⠀⠀⠀⠈⠻⣿⣿⣿⣦⡀⠀⠉⠉⠻⣿⣿⡇
+     ⠛⠿⣿⣿⣿⣿⣷⣤⡀⠀⠀⠀⠀⠈⠹⣿⣿⣇⣀ ⣠⣾⣿⣿⡇
+          ⠹⣿⣿⣿⣿⣦⣤⣤⣤⣤⣾⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀
+              ⠉⠻⢿⣿⣿⣿⣿⣿⣿⠿⠋⠉⠛⠋⠉⠉⠁⠀
+⠀                 ⠈⠉⠉⠉⠁
+**/
