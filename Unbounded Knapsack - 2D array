@@ -8,9 +8,6 @@ int main() {
     cin.tie(0);
     cout.tie(0);
 
-    // freopen("KNAPSACK.inp","r",stdin);
-    // freopen("KNAPSACK.out","w",stdout);
-
     long long n,b;
     cin>>n>>b;
     long long a[n+1][b+1];
