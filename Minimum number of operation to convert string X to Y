@@ -1,0 +1,87 @@
+/**
+ * Given a string x and y, perform any of the following operations to convert string x to y.
+ * 1: insert(i,C) - insert character C behind position i
+ * 2: replace(i,C) - replace x[i] = C
+ * 3: erase(i) - erase x[i]
+ */
+
+#include <bits/stdc++.h>
+using namespace std;
+
+int dp[105][105];
+pair<int,pair<int,char>> trace[105][105];
+
+int main() {
+    ios_base::sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
+
+    freopen("STR.inp","r",stdin);
+    freopen("STR.out","w",stdout);
+
+    string s1,s2;
+
+    cin>>s1>>s2;
+    
+    for(int i=0;i<=s1.size();i++){
+        dp[i][0] = i;
+    }
+
+    for(int j=0;j<=s1.size();j++){
+        dp[0][j] = j;
+    }
+
+    for(int i=1;i<=s1.size();i++){
+        for(int j=1;j<=s2.size();j++){
+            if(s1[i-1] == s2[j-1]){
+                dp[i][j] = dp[i-1][j-1];
+            }
+            else{
+                dp[i][j] = min(dp[i-1][j],min(dp[i][j-1],dp[i-1][j-1])) + 1;
+            }
+        }
+    }
+
+    int i = s1.size(),j=s2.size();
+
+    while(i >= 1 && j >= 1){
+        if(s1[i-1] == s2[j-1]){
+            i--;
+            j--;
+        }
+        else{
+            if(dp[i][j] == dp[i-1][j] + 1){
+                cout<<"DELETE("<<i<<")"<<endl;
+                i--;
+            }
+            else if(dp[i][j] == dp[i][j-1] + 1){
+                cout<<"INSERT("<<i<<", "<<s2[j-1]<<")"<<endl;
+                j--;
+            }
+            else if(dp[i][j] == dp[i-1][j-1] + 1){
+                cout<<"REPALCE("<<i<<", "<<s2[j-1]<<")"<<endl;
+                i--;
+                j--;
+            }
+        }
+    }
+    return 0;
+}
+/**
+⠀⠀⠀⠀⠀⠀⠀⠀ ⠀⠀⠀⣠⣴⣶⣿⣿⣷⣶⣄⣀⣀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀ ⠀⠀⣰⣾⣿⣿⡿⢿⣿⣿⣿⣿⣿⣿⣿⣷⣦⡀⠀⠀
+⠀⠀⠀⠀⠀⠀ ⠀⢀⣾⣿⣿⡟⠁⣰⣿⣿⣿⡿⠿⠻⠿⣿⣿⣿⣿⣧
+⠀⠀⠀⠀⠀ ⠀⠀⣾⣿⣿⠏⠀⣴⣿⣿⣿⠉⠀⠀⠀⠀⠀⠈⢻⣿⣿⣇
+⠀⠀⠀⠀  ⣠⣼⣿⣿⡏⠀⢠⣿⣿⣿⠇⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿⣿⡀
+⠀⠀⠀ ⣰⣿⣿⣿⣿⣿⡇⠀⢸⣿⣿⣿⡀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⡇
+⠀⠀ ⢰⣿⣿⡿⣿⣿⣿⡇⠀⠘⣿⣿⣿⣧⠀⠀⠀⠀⠀⠀⢀⣸⣿⣿⣿⠁
+⠀  ⣿⣿⣿⠁⣿⣿⣿⡇⠀⠀⠻⣿⣿⣿⣷⣶⣶⣶⣶⣶⣿⣿⣿⣿⠃
+  ⢰⣿⣿⡇⠀⣿⣿⣿⠀⠀⠀⠀⠈⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠁⠀
+  ⢸⣿⣿⡇⠀⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠉⠛⠛⠛⠉⢉⣿⣿⠀⠀⠀⠀
+  ⢸⣿⣿⣇⠀⣿⣿⣿⠀⠀⠀⠀⠀⢀⣤⣤⣤⡀⠀⠀⢸⣿⣿⣿⣷⣦⠀
+   ⢻⣿⣿⣶⣿⣿⣿⠀⠀⠀⠀⠀⠈⠻⣿⣿⣿⣦⡀⠀⠉⠉⠻⣿⣿⡇
+     ⠛⠿⣿⣿⣿⣿⣷⣤⡀⠀⠀⠀⠀⠈⠹⣿⣿⣇⣀ ⣠⣾⣿⣿⡇
+          ⠹⣿⣿⣿⣿⣦⣤⣤⣤⣤⣾⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀
+              ⠉⠻⢿⣿⣿⣿⣿⣿⣿⠿⠋⠉⠛⠋⠉⠉⠁⠀
+⠀                 ⠈⠉⠉⠉⠁
+**/
