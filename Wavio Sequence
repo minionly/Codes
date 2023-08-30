@@ -1,0 +1,86 @@
+/**
+ * @file main.cpp
+ * @author tnknguyen_ (nguyenngockhoitran@gmail.com)
+ * @date 30-08-2023
+ * 
+ * @copyright Copyright (c) 2023
+ * https://oj.vnoi.info/problem/spseq
+ */
+#include <bits/stdc++.h>
+using namespace std;
+
+int a[100005],dp[100005];
+vector<int> v1;
+
+int main() {
+    ios_base::sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
+
+    int n,ans=1;
+
+    cin>>n;
+
+    for(int i=0;i<n;i++){
+        cin>>a[i];
+    }
+
+    v1.push_back(a[0]);
+    dp[0] = 1;
+
+    for(int i=1;i<n;i++){
+        if(a[i] > v1.back()){
+            v1.push_back(a[i]);
+            dp[i] = v1.size();
+        }
+        else{
+            int p = lower_bound(v1.begin(),v1.end(),a[i]) - v1.begin();
+            if(p != v1.size()){
+                v1[p] = a[i];
+                dp[i] = p+1;
+            }
+        }
+    }
+
+    v1.clear();
+    v1.push_back(a[n-1]);
+
+    for(int i=n-2;i>=0;i--){
+        int temp = -1;
+        if(a[i] > v1.back()){
+            v1.push_back(a[i]);
+            temp = v1.size();
+        }
+        else{
+            int p = lower_bound(v1.begin(),v1.end(),a[i]) - v1.begin();
+            if(p != v1.size()){
+                v1[p] = a[i];
+                temp = p+1;
+            }
+        }
+        if(temp != -1){
+            ans = max(ans,min(dp[i], temp)*2-1);
+        }
+    }
+
+    cout<<ans;
+    return 0;
+}
+/**
+⠀⠀⠀⠀⠀⠀⠀⠀ ⠀⠀⠀⣠⣴⣶⣿⣿⣷⣶⣄⣀⣀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀ ⠀⠀⣰⣾⣿⣿⡿⢿⣿⣿⣿⣿⣿⣿⣿⣷⣦⡀⠀⠀
+⠀⠀⠀⠀⠀⠀ ⠀⢀⣾⣿⣿⡟⠁⣰⣿⣿⣿⡿⠿⠻⠿⣿⣿⣿⣿⣧
+⠀⠀⠀⠀⠀ ⠀⠀⣾⣿⣿⠏⠀⣴⣿⣿⣿⠉⠀⠀⠀⠀⠀⠈⢻⣿⣿⣇
+⠀⠀⠀⠀  ⣠⣼⣿⣿⡏⠀⢠⣿⣿⣿⠇⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿⣿⡀
+⠀⠀⠀ ⣰⣿⣿⣿⣿⣿⡇⠀⢸⣿⣿⣿⡀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⡇
+⠀⠀ ⢰⣿⣿⡿⣿⣿⣿⡇⠀⠘⣿⣿⣿⣧⠀⠀⠀⠀⠀⠀⢀⣸⣿⣿⣿⠁
+⠀  ⣿⣿⣿⠁⣿⣿⣿⡇⠀⠀⠻⣿⣿⣿⣷⣶⣶⣶⣶⣶⣿⣿⣿⣿⠃
+  ⢰⣿⣿⡇⠀⣿⣿⣿⠀⠀⠀⠀⠈⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠁⠀
+  ⢸⣿⣿⡇⠀⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠉⠛⠛⠛⠉⢉⣿⣿⠀⠀⠀⠀
+  ⢸⣿⣿⣇⠀⣿⣿⣿⠀⠀⠀⠀⠀⢀⣤⣤⣤⡀⠀⠀⢸⣿⣿⣿⣷⣦⠀
+   ⢻⣿⣿⣶⣿⣿⣿⠀⠀⠀⠀⠀⠈⠻⣿⣿⣿⣦⡀⠀⠉⠉⠻⣿⣿⡇
+     ⠛⠿⣿⣿⣿⣿⣷⣤⡀⠀⠀⠀⠀⠈⠹⣿⣿⣇⣀ ⣠⣾⣿⣿⡇
+          ⠹⣿⣿⣿⣿⣦⣤⣤⣤⣤⣾⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀
+              ⠉⠻⢿⣿⣿⣿⣿⣿⣿⠿⠋⠉⠛⠋⠉⠉⠁⠀
+⠀                 ⠈⠉⠉⠉⠁
+**/
