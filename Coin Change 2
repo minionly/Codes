@@ -1,0 +1,69 @@
+/**
+ * @file main.cpp
+ * @author tnknguyen_ (nguyenngockhoitran@gmail.com)
+ * @date 30-08-2023
+ * 
+ * @copyright Copyright (c) 2023
+ * https://leetcode.com/problems/coin-change-ii/
+ */
+#include <bits/stdc++.h>
+using namespace std;
+
+vector<int> coins;
+
+int main() {
+    ios_base::sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
+
+    freopen("main.inp","r",stdin);
+    freopen("main.out","w",stdout);
+
+    int amount,m,x;
+
+    cin>>amount>>m;
+
+    for(int i=0;i<m;i++){
+        cin>>x;
+        coins.push_back(x);
+    }
+    sort(coins.begin(),coins.end());
+    vector<vector<int>> dp(m+1, vector<int>(amount+1,0));
+
+    for(int i=0;i<coins.size();i++){
+        dp[i][0] = 1;
+    }
+    
+    for(int i=coins.size()-1;i>=0;i--){
+        for(int j=1;j<=amount;j++){
+            if(j >= coins[i]){
+                dp[i][j] = dp[i][j - coins[i]];
+                if(i + 1 < coins.size()){
+                    dp[i][j] += dp[i+1][j];
+                }
+            }
+        }
+    }
+
+    cout<<dp[0][amount];
+
+    return 0;
+}
+/**
+⠀⠀⠀⠀⠀⠀⠀⠀ ⠀⠀⠀⣠⣴⣶⣿⣿⣷⣶⣄⣀⣀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀ ⠀⠀⣰⣾⣿⣿⡿⢿⣿⣿⣿⣿⣿⣿⣿⣷⣦⡀⠀⠀
+⠀⠀⠀⠀⠀⠀ ⠀⢀⣾⣿⣿⡟⠁⣰⣿⣿⣿⡿⠿⠻⠿⣿⣿⣿⣿⣧
+⠀⠀⠀⠀⠀ ⠀⠀⣾⣿⣿⠏⠀⣴⣿⣿⣿⠉⠀⠀⠀⠀⠀⠈⢻⣿⣿⣇
+⠀⠀⠀⠀  ⣠⣼⣿⣿⡏⠀⢠⣿⣿⣿⠇⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿⣿⡀
+⠀⠀⠀ ⣰⣿⣿⣿⣿⣿⡇⠀⢸⣿⣿⣿⡀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⡇
+⠀⠀ ⢰⣿⣿⡿⣿⣿⣿⡇⠀⠘⣿⣿⣿⣧⠀⠀⠀⠀⠀⠀⢀⣸⣿⣿⣿⠁
+⠀  ⣿⣿⣿⠁⣿⣿⣿⡇⠀⠀⠻⣿⣿⣿⣷⣶⣶⣶⣶⣶⣿⣿⣿⣿⠃
+  ⢰⣿⣿⡇⠀⣿⣿⣿⠀⠀⠀⠀⠈⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠁⠀
+  ⢸⣿⣿⡇⠀⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠉⠛⠛⠛⠉⢉⣿⣿⠀⠀⠀⠀
+  ⢸⣿⣿⣇⠀⣿⣿⣿⠀⠀⠀⠀⠀⢀⣤⣤⣤⡀⠀⠀⢸⣿⣿⣿⣷⣦⠀
+   ⢻⣿⣿⣶⣿⣿⣿⠀⠀⠀⠀⠀⠈⠻⣿⣿⣿⣦⡀⠀⠉⠉⠻⣿⣿⡇
+     ⠛⠿⣿⣿⣿⣿⣷⣤⡀⠀⠀⠀⠀⠈⠹⣿⣿⣇⣀ ⣠⣾⣿⣿⡇
+          ⠹⣿⣿⣿⣿⣦⣤⣤⣤⣤⣾⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀
+              ⠉⠻⢿⣿⣿⣿⣿⣿⣿⠿⠋⠉⠛⠋⠉⠉⠁⠀
+⠀                 ⠈⠉⠉⠉⠁
+**/
