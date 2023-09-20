@@ -1,3 +1,34 @@
+/**
+ * @file NKPALIN.cpp
+ * @author tnknguyen_ (nguyenngockhoitran@gmail.com)
+ * @date 20-09-2023
+ * 
+ * @copyright Copyright (c) 2023
+ * https://oj.vnoi.info/problem/nkpalin
+ * 
+ * dp[i][j] is the minimum number deletion to make substring s[i..j] palindromic 
+ * There are 2 possibility: 
+ * 1 - if the 2 char is equal (s[i] == s[j]), we carry on the previous answer:
+ * 
+ *      dp[i][j] = dp[i+1][j-1]
+ * 
+ * 2 - if the 2 char is different, we delete the end (s[i][j-1]), or the beginning (s[i+1][j]),
+ * taking the minimum answer + delete operation:
+ *  
+*     dp[i][j] = min(dp[i+1][j] , dp[i][j-1]) + 1;
+ * 
+ * ----TRACING----
+ * i = 0;
+ * j = s.size()-1;
+ * 
+ * while the 2 position are not the same / overlapping, we check 2 cases:
+ *  1 - s[i] = s[j], this means that we do not need to deleter any of these 2 characters,
+ *      so we increase im decrease j and move on
+ *  2 - s[i] != s[j], this means that we need to delete 1 of the 2s character. 
+ *      if dp[i+1][j] <= dp[i][j+1], we delete the i-th character since there is less deletion, then increment i
+ *      otherwise, we delete the j-th character, the decrement j
+ *      mark the i/j -th character as 0 as we will not print it out (deleted)
+ */
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -8,8 +39,8 @@ int main() {
     cin.tie(0);
     cout.tie(0);
 
-    freopen("main.inp","r",stdin);
-    freopen("main.out","w",stdout);
+    freopen("NKPALIN.inp","r",stdin);
+    freopen("NKPALIN.out","w",stdout);
 
     string s;
     cin>>s;
@@ -26,14 +57,14 @@ int main() {
     }
 
     int i=0,j=s.size()-1;
-    // tracing for deletion
+
     while(dp[i][j] > 0){
         if(s[i] == s[j]){
             i++;
             j--;
         }
         else{
-            if(dp[i+1][j] <= dp[i][j+1]){
+            if(dp[i][j-1] >= dp[i+1][j]){
                 s[i] = '0';
                 i++;
             }
@@ -48,7 +79,7 @@ int main() {
         if(c != '0'){
             cout<<c;
         }
-    }
+    }  
 
     return 0;
 }
