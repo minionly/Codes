@@ -1,0 +1,58 @@
+/**
+ * @file CAMHOA.cpp
+ * @author tnknguyen_ (nguyenngockhoitran@gmail.com)
+ * @date 21-09-2023
+ * 
+ * @copyright Copyright (c) 2023
+ * https://oj.vnoi.info/problem/tpbinhtphcm_0724
+ *  
+ * f[i][j] is the maximum points possible after going through i-flowers, j pots
+ * - If i == j, there is only 1 way to put each flower into each pot, a[1,1] + a[2,2] .. a[n,n]:
+ *      dp[i][j] = dp[i-1][j-1] + a[i][j];
+ * - Otherwise, there are 2 possibility:
+ * 1 - we do not put the i-th flower to the j-th pot:
+ *        dp[i][j-1] 
+ * 2 - we put the i-th flower into the j-th pot:
+ *        dp[i-1][j-1] + a[i][j];
+ * Then, we take the maximum score: dp[i][j] = max(dp[i][j-1],dp[i-1][j-1] + a[i][j]);
+ */
+
+#include <bits/stdc++.h>
+using namespace std;
+
+long long a[1005][1005],dp[1005][1005];
+
+int main() {
+    ios_base::sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
+
+    freopen("FLOWER.inp","r",stdin);
+    freopen("FLOWER.out","w",stdout);
+    
+    int w,v;
+
+    cin>>w>>v;
+
+    for(int i=1;i<=w;i++){
+        for(int j=1;j<=v;j++){
+            cin>>a[i][j];
+        }
+    }
+
+    for(int i=1;i<=w;i++){
+        for(int j=1;j<=v;j++){
+            if(i == j){
+                dp[i][j] = dp[i-1][j-1] + a[i][j];
+            }
+            else{
+                dp[i][j] = max(dp[i][j-1],dp[i-1][j-1] + a[i][j]);
+                
+            }
+        }
+    }
+
+    cout<<dp[w][v];
+
+    return 0;
+}
