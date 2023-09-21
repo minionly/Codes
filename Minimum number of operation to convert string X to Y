@@ -3,6 +3,15 @@
  * 1: insert(i,C) - insert character C behind position i
  * 2: replace(i,C) - replace x[i] = C
  * 3: erase(i) - erase x[i]
+ * 
+ * - If the 2 character is equal we do not do anything:
+ *       dp[i][j] = dp[i-1][j-1];
+ * - Otherwise, we have to perform 1 of 3 operations:
+ *      1 - dp[i][j-1]: insert y[j] to x
+ *      2 - dp[i-1][j]: erase x[i]
+ *      3 - dp[i-1][j-1]: replace x[i] = y[j]
+ *  then we take the minimum: 
+ *      dp[i][j] = min(dp[i-1][j],min(dp[i][j-1],dp[i-1][j-1])) + 1;
  */
 
 #include <bits/stdc++.h>
