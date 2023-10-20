@@ -1,0 +1,72 @@
+#include <bits/stdc++.h>
+using namespace std;
+/**
+* IDEA: DFS to see if it returns to the origin
+*/
+ 
+vector<int> gr[100005];
+int vi[100005], par[100005], st=-1, en;
+bool flag = 0;
+
+bool dfs(int s, int p){
+    vi[s] = 1;
+    for(int i : gr[s]){
+        if(i == p){
+            continue;
+        }
+        if(vi[i]){
+            st = i;
+            en = s;
+            return 1;
+        }
+        par[i] = s;
+        if(dfs(i, par[i])){
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int main() {
+    ios_base::sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
+ 
+    // freopen("main.inp","r",stdin);
+    // freopen("main.out","w",stdout);
+ 
+    int n,m;
+ 
+    cin>>n>>m;
+ 
+    while(m--){
+        int u,v;
+        cin>>u>>v;
+        gr[u].push_back(v);
+        gr[v].push_back(u);
+    }
+    
+    for(int i=1;i<=n;i++){
+        if(!vi[i] && dfs(i, par[i])){
+            break;
+        }
+    }
+
+    if(st == -1){
+        cout<<"IMPOSSIBLE";
+        return 0;
+    }
+    vector<int> v;
+    v.push_back(st);
+    while(en != st){
+        v.push_back(en);
+        en = par[en];
+    }
+    v.push_back(st);
+    cout<<v.size()<<endl;
+    for(int i : v){
+        cout<<i<<' ';
+    }
+ 
+    return 0;
+}
