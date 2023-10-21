@@ -1,0 +1,127 @@
+#include <bits/stdc++.h>
+using namespace std;
+/**
+Problem Source: https://cses.fi/problemset/task/1673
+* IDEA: 
+- Flip the signs of all edge cost then run Bellman Ford SSSP algorithm
+- DFS to check if path from 1 to n encounters a cycle
+*/
+
+vector<pair<long long,long long>> gr[2505], Rgr[2505];
+vector<pair<pair<long long, long long>, long long>> vec;
+bool cycle[2505],vi[2505], c = 0; 
+long long d[2505],n, m;
+    
+void Bellman_Ford(int s){
+    d[s] = 0;
+    for(int i=1;i<=n;i++){
+        for(pair<pair<long long, long long>, long long> p : vec){
+            long long j = p.first.first;
+            long long u = p.first.second;
+            long long c = p.second;
+            if(d[j] + c < d[u]){
+                d[u] = d[j] + c;
+            }
+        }
+    }
+    
+    for(int i=1;i<=n;i++){
+        for(pair<pair<long long, long long>, long long> p : vec){
+            long long j = p.first.first;
+            long long u = p.first.second;
+            long long c = p.second;
+            if(d[j] + c < d[u]){
+                d[u] = d[j] + c;
+                cycle[u] = 1;
+            }
+        }
+    }
+}
+
+bool bfs(int s){
+    queue<int> q;
+    q.push(s);
+    vi[s] = 1;
+
+    while(!q.empty()){
+        int u = q.front();
+        q.pop();
+        vi[u] = 1;
+        
+        if(cycle[u]){
+            return 1;
+        }
+
+        for(pair<int,int> p : Rgr[u]){
+            int i = p.first;
+            if(vi[i]){
+                continue;
+            }
+            q.push(i);
+            vi[i] = 1;
+        }
+    }
+    return 0; //path from 1 to n does not contains a cycle
+}
+
+bool dfs(int s, bool flag){
+    vi[s] = 1;
+    if(s == 1){
+        return flag;
+    }
+    for(pair<long long, long long> p : Rgr[s]){
+        if(!vi[p.first]){
+            if(dfs(p.first, max(flag, cycle[p.first]))){
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
+int main() {
+    ios_base::sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
+
+    // freopen("main.inp","r",stdin);
+    // freopen("main.out","w",stdout);
+
+    cin>>n>>m;
+
+    while(m--){
+        long long u,v,c;
+        cin>>u>>v>>c;
+        Rgr[v].push_back({u,c});
+        gr[u].push_back({v,-c});
+        vec.push_back({{u,v},-c});
+        //flip the edge's cost
+    }
+
+    fill(d, d+2505, 1e18);
+    Bellman_Ford(1);
+
+    bool f = dfs(n, cycle[n]);
+    cout<<(f ? -1 : -d[n]);
+
+    return 0;
+}
+/**
+just win today.
+⠀⠀⠀⠀⠀⠀⠀⠀ ⠀⠀⠀⣠⣴⣶⣿⣿⣷⣶⣄⣀⣀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀ ⠀⠀⣰⣾⣿⣿⡿⢿⣿⣿⣿⣿⣿⣿⣿⣷⣦⡀⠀⠀
+⠀⠀⠀⠀⠀⠀ ⠀⢀⣾⣿⣿⡟⠁⣰⣿⣿⣿⡿⠿⠻⠿⣿⣿⣿⣿⣧
+⠀⠀⠀⠀⠀ ⠀⠀⣾⣿⣿⠏⠀⣴⣿⣿⣿⠉⠀⠀⠀⠀⠀⠈⢻⣿⣿⣇
+⠀⠀⠀⠀  ⣠⣼⣿⣿⡏⠀⢠⣿⣿⣿⠇⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿⣿⡀
+⠀⠀⠀ ⣰⣿⣿⣿⣿⣿⡇⠀⢸⣿⣿⣿⡀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⡇
+⠀⠀ ⢰⣿⣿⡿⣿⣿⣿⡇⠀⠘⣿⣿⣿⣧⠀⠀⠀⠀⠀⠀⢀⣸⣿⣿⣿⠁
+⠀  ⣿⣿⣿⠁⣿⣿⣿⡇⠀⠀⠻⣿⣿⣿⣷⣶⣶⣶⣶⣶⣿⣿⣿⣿⠃
+  ⢰⣿⣿⡇⠀⣿⣿⣿⠀⠀⠀⠀⠈⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠁⠀
+  ⢸⣿⣿⡇⠀⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠉⠛⠛⠛⠉⢉⣿⣿⠀⠀⠀⠀
+  ⢸⣿⣿⣇⠀⣿⣿⣿⠀⠀⠀⠀⠀⢀⣤⣤⣤⡀⠀⠀⢸⣿⣿⣿⣷⣦⠀
+   ⢻⣿⣿⣶⣿⣿⣿⠀⠀⠀⠀⠀⠈⠻⣿⣿⣿⣦⡀⠀⠉⠉⠻⣿⣿⡇
+     ⠛⠿⣿⣿⣿⣿⣷⣤⡀⠀⠀⠀⠀⠈⠹⣿⣿⣇⣀ ⣠⣾⣿⣿⡇
+          ⠹⣿⣿⣿⣿⣦⣤⣤⣤⣤⣾⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀
+              ⠉⠻⢿⣿⣿⣿⣿⣿⣿⠿⠋⠉⠛⠋⠉⠉⠁⠀
+⠀                 ⠈⠉⠉⠉⠁
+**/
