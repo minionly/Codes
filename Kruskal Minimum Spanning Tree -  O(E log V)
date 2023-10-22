@@ -1,0 +1,97 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+int par[1005], sz[1005], d[1005][1005];
+vector<pair<int,pair<int,int>>> v;
+
+bool comp(pair<int,pair<int,int>> p1, pair<int,pair<int,int>> p2){
+    if(p1.first == p2.first){
+        return p1.second.first < p2.second.first;
+    }
+    return p1.first < p2.first;
+}
+
+void make_sets(int n){
+    for(int i=1;i<=n;i++){
+        par[i] = i;
+        sz[i] = 1;
+    }
+}
+
+int find(int u){
+    if(par[u] == u){
+        return u;
+    }
+    return par[u] = find(par[u]);
+}
+
+void unite(int u, int v){
+    u = find(u);
+    v = find(v);
+
+    if(u == v){
+        return;
+    }
+    if(sz[v] > sz[u]){
+        swap(u,v);
+    }
+
+    sz[u] += sz[v];
+    par[v] = u;
+}
+
+int main() {
+    ios_base::sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
+
+    freopen("NODE.inp","r",stdin);
+    freopen("NODE.out","w",stdout);
+
+    int n,i,j,c;
+
+    cin>>n;
+    
+    make_sets(n);
+
+    while(cin>>i){
+        cin>>j>>c;
+        v.push_back({c,{i,j}});
+        d[i][j] = c;
+        d[j][i] = c;
+    }
+
+    sort(v.begin(), v.end(), comp);
+
+    int ans = 0;
+    for(pair<int,pair<int,int>> p : v){
+        int i = p.second.first, j = p.second.second;
+        if(find(i) != find(j)){
+            unite(i,j);
+            ans += d[i][j];
+        }
+    }
+
+    cout<<ans;
+
+    return 0;
+}
+/**
+just win today.
+⠀⠀⠀⠀⠀⠀⠀⠀ ⠀⠀⠀⣠⣴⣶⣿⣿⣷⣶⣄⣀⣀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀ ⠀⠀⣰⣾⣿⣿⡿⢿⣿⣿⣿⣿⣿⣿⣿⣷⣦⡀⠀⠀
+⠀⠀⠀⠀⠀⠀ ⠀⢀⣾⣿⣿⡟⠁⣰⣿⣿⣿⡿⠿⠻⠿⣿⣿⣿⣿⣧
+⠀⠀⠀⠀⠀ ⠀⠀⣾⣿⣿⠏⠀⣴⣿⣿⣿⠉⠀⠀⠀⠀⠀⠈⢻⣿⣿⣇
+⠀⠀⠀⠀  ⣠⣼⣿⣿⡏⠀⢠⣿⣿⣿⠇⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿⣿⡀
+⠀⠀⠀ ⣰⣿⣿⣿⣿⣿⡇⠀⢸⣿⣿⣿⡀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⡇
+⠀⠀ ⢰⣿⣿⡿⣿⣿⣿⡇⠀⠘⣿⣿⣿⣧⠀⠀⠀⠀⠀⠀⢀⣸⣿⣿⣿⠁
+⠀  ⣿⣿⣿⠁⣿⣿⣿⡇⠀⠀⠻⣿⣿⣿⣷⣶⣶⣶⣶⣶⣿⣿⣿⣿⠃
+  ⢰⣿⣿⡇⠀⣿⣿⣿⠀⠀⠀⠀⠈⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠁⠀
+  ⢸⣿⣿⡇⠀⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠉⠛⠛⠛⠉⢉⣿⣿⠀⠀⠀⠀
+  ⢸⣿⣿⣇⠀⣿⣿⣿⠀⠀⠀⠀⠀⢀⣤⣤⣤⡀⠀⠀⢸⣿⣿⣿⣷⣦⠀
+   ⢻⣿⣿⣶⣿⣿⣿⠀⠀⠀⠀⠀⠈⠻⣿⣿⣿⣦⡀⠀⠉⠉⠻⣿⣿⡇
+     ⠛⠿⣿⣿⣿⣿⣷⣤⡀⠀⠀⠀⠀⠈⠹⣿⣿⣇⣀ ⣠⣾⣿⣿⡇
+          ⠹⣿⣿⣿⣿⣦⣤⣤⣤⣤⣾⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀
+              ⠉⠻⢿⣿⣿⣿⣿⣿⣿⠿⠋⠉⠛⠋⠉⠉⠁⠀
+⠀                 ⠈⠉⠉⠉⠁
+**/
