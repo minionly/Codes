@@ -2,7 +2,7 @@
 using namespace std;
 /**
 * IDEA: DFS to see if it returns to the origin
-  Undirected Graph
+
 */
  
 vector<int> gr[100005];
