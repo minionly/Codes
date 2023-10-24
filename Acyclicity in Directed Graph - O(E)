@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 /**
-* IDEA: DFS + coloring technique to check for cycles on UNDIRECTED GRAPH
+* IDEA: DFS + coloring technique to check for cycles on DIRECTED GRAPH
 */
  
 vector<int> gr[100005];
