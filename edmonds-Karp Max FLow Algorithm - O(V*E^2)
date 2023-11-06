@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 /**
-* IDEA: Ford-Fulkerson max flow algorithm
+* IDEA: Edmonds-Karp max flow algorithm
 */
  
 long long gr[505][505], pre[505], vi[505], viid = 0, n, m;
