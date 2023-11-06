@@ -1,0 +1,98 @@
+#include <bits/stdc++.h>
+using namespace std;
+/**
+* IDEA: Ford-Fulkerson max flow algorithm
+*/
+ 
+long long gr[505][505], pre[505], vi[505], viid = 0, n, m;
+ 
+bool bfs(int s, int t){
+    viid++;
+    vi[s] = viid;
+    queue<int> q;
+    q.push(s);
+    pre[s] = -1;
+ 
+    while(!q.empty()){
+        int v = q.front();
+        q.pop();
+        
+        if(v == t){
+            return 1;
+        }
+ 
+        for(int i=1;i<=n;i++){
+            if(vi[i] != viid && gr[v][i] > 0){ //if we can push more flow through any edge. 
+                q.push(i);
+                pre[i] = v;
+                vi[i] = viid;
+            }
+        }
+    }
+ 
+    return 0; //no more augment path is found - sink is not reached
+}
+ 
+long long Ford_Fulkerson(int s, int t){ //max flow from s -> t
+    long long max_flow = 0; //inital flow = 0.
+ 
+    while(bfs(s,t)){ //while there is another augment path s -> t.
+ 
+        long long bottle_neck = INT_MAX; //bottle neck of a found path
+ 
+        for(int v=t;v!=s;v = pre[v]){
+            int u = pre[v];
+            bottle_neck = min(bottle_neck, gr[u][v]);
+        }
+ 
+        for(int v=t;v!=s;v = pre[v]){
+            int u = pre[v];
+            gr[v][u] += bottle_neck; //increase capacity of backward edge
+            gr[u][v] -= bottle_neck; //decrease capacity of the forward edge
+        }
+ 
+        max_flow += bottle_neck;
+    }
+ 
+    return max_flow;
+}
+ 
+int main() {
+    ios_base::sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
+ 
+    // freopen("main.inp","r",stdin);
+    // freopen("main.out","w",stdout);
+ 
+    cin>>n>>m;
+ 
+    while(m--){
+        long long u,v,c;
+        cin>>u>>v>>c;
+        gr[u][v] += c; //forward edge
+    }
+ 
+    cout<<Ford_Fulkerson(1,n);
+ 
+    return 0;
+}
+/**
+just win today.
+⠀⠀⠀⠀⠀⠀⠀⠀ ⠀⠀⠀⣠⣴⣶⣿⣿⣷⣶⣄⣀⣀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀ ⠀⠀⣰⣾⣿⣿⡿⢿⣿⣿⣿⣿⣿⣿⣿⣷⣦⡀⠀⠀
+⠀⠀⠀⠀⠀⠀ ⠀⢀⣾⣿⣿⡟⠁⣰⣿⣿⣿⡿⠿⠻⠿⣿⣿⣿⣿⣧
+⠀⠀⠀⠀⠀ ⠀⠀⣾⣿⣿⠏⠀⣴⣿⣿⣿⠉⠀⠀⠀⠀⠀⠈⢻⣿⣿⣇
+⠀⠀⠀⠀  ⣠⣼⣿⣿⡏⠀⢠⣿⣿⣿⠇⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿⣿⡀
+⠀⠀⠀ ⣰⣿⣿⣿⣿⣿⡇⠀⢸⣿⣿⣿⡀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⡇
+⠀⠀ ⢰⣿⣿⡿⣿⣿⣿⡇⠀⠘⣿⣿⣿⣧⠀⠀⠀⠀⠀⠀⢀⣸⣿⣿⣿⠁
+⠀  ⣿⣿⣿⠁⣿⣿⣿⡇⠀⠀⠻⣿⣿⣿⣷⣶⣶⣶⣶⣶⣿⣿⣿⣿⠃
+  ⢰⣿⣿⡇⠀⣿⣿⣿⠀⠀⠀⠀⠈⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠁⠀
+  ⢸⣿⣿⡇⠀⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠉⠛⠛⠛⠉⢉⣿⣿⠀⠀⠀⠀
+  ⢸⣿⣿⣇⠀⣿⣿⣿⠀⠀⠀⠀⠀⢀⣤⣤⣤⡀⠀⠀⢸⣿⣿⣿⣷⣦⠀
+   ⢻⣿⣿⣶⣿⣿⣿⠀⠀⠀⠀⠀⠈⠻⣿⣿⣿⣦⡀⠀⠉⠉⠻⣿⣿⡇
+     ⠛⠿⣿⣿⣿⣿⣷⣤⡀⠀⠀⠀⠀⠈⠹⣿⣿⣇⣀ ⣠⣾⣿⣿⡇
+          ⠹⣿⣿⣿⣿⣦⣤⣤⣤⣤⣾⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀
+              ⠉⠻⢿⣿⣿⣿⣿⣿⣿⠿⠋⠉⠛⠋⠉⠉⠁⠀
+⠀                 ⠈⠉⠉⠉⠁
+**/
