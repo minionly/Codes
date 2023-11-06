@@ -1,0 +1,135 @@
+#include <bits/stdc++.h>
+using namespace std;
+/**
+* IDEA: 2-SAT + SCC + Topo sort
+- Create edges for each 2 node:
+    + not x -> y;
+    + not y -> x
+- Run SCC to get a topological sort
+- Mark every SCC using reversed graph
+- Check satisfiability + Assign T/F values for each not
+*/
+
+int low[200005], ids[200005], on_stack[200005],vi[200005],col[200005], id = 1, m, n;
+vector<int> gr[200005], Rgr[200005];
+stack<int> st, topo;
+
+void dfs(int s){
+    st.push(s);
+    on_stack[s] = 1;
+    ids[s] = low[s] = id;
+    id++;
+
+    for(int i : gr[s]){
+        if(ids[i] == 0){
+            dfs(i);
+        }
+        if(on_stack[i]){
+            low[s] = min(low[s], low[i]);
+        }
+    }
+
+    if(ids[s] == low[s]){
+        int t = st.top();
+        while(t != s){
+            on_stack[t] = 0;
+            low[t] = low[s];
+            st.pop();
+            t = st.top();
+        }
+
+        on_stack[s] = 0;
+        if(st.top() == s){
+            st.pop();
+        }
+    }
+    topo.push(s);
+}
+
+void top(int s, int color){
+    vi[s] = 1;
+    col[s] = color;
+    for(int i : Rgr[s]){
+        if(!vi[i]){
+            top(i, color);
+        }
+    }
+}
+
+int main() {
+    ios_base::sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
+
+    freopen("main.inp","r",stdin);
+    freopen("main.out","w",stdout);
+
+    cin>>m>>n;
+
+    while(m--){
+        char c1, c2;
+        int x1, x2;
+        cin >> c1 >> x1 >> c2 >> x2;
+        int b1 = (c1 == '+');
+        int b2 = (c2 == '+');
+        gr[n * (1 - b1) + x1].push_back(n * b2 + x2); //not x1 -> x2
+        gr[n * (1 - b2) + x2].push_back(n * b1 + x1); //not x2 -> x1
+
+        //reverse graph
+        Rgr[n * b2 + x2].push_back(n * (1 - b1) + x1);
+        Rgr[n * b1 + x1].push_back(n * (1 - b2) + x2);
+    }
+
+    for(int i=1;i<=2*n;i++){
+        if(ids[i] == 0){
+            dfs(i); //SCC + topo sort
+        }
+    }
+
+    int color = 0;
+    while(!topo.empty()){
+        if(!vi[topo.top()]){
+            top(topo.top(), color++);
+        }
+        topo.pop();
+    }
+
+    vector<char> v(n + 5);
+    for(int i=1;i<=n;i++){
+        if(col[i] == col[i+n]){ // not_p == p which is not valid
+            cout << "IMPOSSIBLE" << endl;
+            return 0;
+        }
+        if(col[i] < col[i+n]){ //if p is reached before not_p: p = True
+            v[i] = '+';
+        }
+        if(col[i] > col[i+n]){ //if not_p is reached before p: p = False
+            v[i] = '-';
+        }
+    }
+
+    for(int i=1;i<=n;i++){
+        cout<<v[i]<<' ';
+    }
+
+    return 0;
+}
+/**
+just win today.
+⠀⠀⠀⠀⠀⠀⠀⠀ ⠀⠀⠀⣠⣴⣶⣿⣿⣷⣶⣄⣀⣀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀ ⠀⠀⣰⣾⣿⣿⡿⢿⣿⣿⣿⣿⣿⣿⣿⣷⣦⡀⠀⠀
+⠀⠀⠀⠀⠀⠀ ⠀⢀⣾⣿⣿⡟⠁⣰⣿⣿⣿⡿⠿⠻⠿⣿⣿⣿⣿⣧
+⠀⠀⠀⠀⠀ ⠀⠀⣾⣿⣿⠏⠀⣴⣿⣿⣿⠉⠀⠀⠀⠀⠀⠈⢻⣿⣿⣇
+⠀⠀⠀⠀  ⣠⣼⣿⣿⡏⠀⢠⣿⣿⣿⠇⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿⣿⡀
+⠀⠀⠀ ⣰⣿⣿⣿⣿⣿⡇⠀⢸⣿⣿⣿⡀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⡇
+⠀⠀ ⢰⣿⣿⡿⣿⣿⣿⡇⠀⠘⣿⣿⣿⣧⠀⠀⠀⠀⠀⠀⢀⣸⣿⣿⣿⠁
+⠀  ⣿⣿⣿⠁⣿⣿⣿⡇⠀⠀⠻⣿⣿⣿⣷⣶⣶⣶⣶⣶⣿⣿⣿⣿⠃
+  ⢰⣿⣿⡇⠀⣿⣿⣿⠀⠀⠀⠀⠈⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠁⠀
+  ⢸⣿⣿⡇⠀⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠉⠛⠛⠛⠉⢉⣿⣿⠀⠀⠀⠀
+  ⢸⣿⣿⣇⠀⣿⣿⣿⠀⠀⠀⠀⠀⢀⣤⣤⣤⡀⠀⠀⢸⣿⣿⣿⣷⣦⠀
+   ⢻⣿⣿⣶⣿⣿⣿⠀⠀⠀⠀⠀⠈⠻⣿⣿⣿⣦⡀⠀⠉⠉⠻⣿⣿⡇
+     ⠛⠿⣿⣿⣿⣿⣷⣤⡀⠀⠀⠀⠀⠈⠹⣿⣿⣇⣀ ⣠⣾⣿⣿⡇
+          ⠹⣿⣿⣿⣿⣦⣤⣤⣤⣤⣾⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀
+              ⠉⠻⢿⣿⣿⣿⣿⣿⣿⠿⠋⠉⠛⠋⠉⠉⠁⠀
+⠀                 ⠈⠉⠉⠉⠁
+**/
