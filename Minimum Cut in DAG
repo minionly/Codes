@@ -1,0 +1,111 @@
+#include <bits/stdc++.h>
+using namespace std;
+/**
+* IDEA: Ford-Fulkerson max flow algorithm
+        Edmonds Karp - max flow algorithm
+        Capacity Scalling algorithm
+*/
+ 
+long long gr[505][505],gr2[505][505], pre[505], vi[505], viid = 0, n, m, delta = 0;
+ 
+long long dfs(int s, int t, int delta, long long flow){
+    if(s == t){
+        return flow; //return the augmented path flow. 
+    }
+    vi[s] = viid;
+
+    for(int i=1;i<=n;i++){
+        //continue to find path if the remaining capacity is >= delta.
+        if(gr[s][i] >= delta && vi[i] != viid){ 
+            pre[i] = s;
+            long long bottle_neck = dfs(i, t, delta, min(flow, gr[s][i]));
+            if(bottle_neck > 0){
+                return bottle_neck; //a augment path is found 
+            }
+        }
+    }
+
+    return 0; //no augment path is found
+}
+ 
+long long Capacity_Scalling(int s, int t, long long delta){
+    long long max_flow = 0, f = 1;
+
+    while(delta > 0){
+        viid++;
+        f = dfs(s,t,delta, 1e16); //get the augment path flow.
+        while(f != 0){ //while a new augmented path is found
+            max_flow += f; //add more flow to the sink.
+            if(f != 0){
+                for(int v = t;v != s;v = pre[v]){ //update capacity for each edge of augmented path
+                    int u = pre[v];
+                    gr[u][v] -= f;
+                    gr[v][u] += f;
+                }
+            }
+            viid++;
+            f = dfs(s,t,delta, 1e15); //get the augment path flow.
+        }
+        delta /= 2;
+    }
+    return max_flow;
+}
+
+int main() {
+    ios_base::sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
+ 
+    // freopen("main.inp","r",stdin);
+    // freopen("main.out","w",stdout);
+ 
+    cin>>n>>m;
+ 
+    while(m--){
+        long long u,v,c;
+        cin>>u>>v;
+        c = 1;
+        gr[u][v] += c; //forward edge
+        gr[v][u] += c; //backward edge
+        gr2[u][v] += c; //forward edge
+        gr2[v][u] += c; //backward edge
+        delta = max(delta, (long long) pow(2, floor(log2(gr[u][v]))));
+    }
+
+    Capacity_Scalling(1, n, delta);
+
+    vector<pair<int,int>> v;
+    for(int i=1;i<=n;i++){
+        for(int j=1;j<=n;j++){
+            if(vi[i] == viid && vi[j] != viid && gr2[i][j]){
+                v.push_back({i,j});
+            }
+        }
+    }
+
+    cout<<v.size()<<endl;
+    for(pair<int,int> p : v){
+        cout<<p.first<<' '<<p.second<<endl;
+    }
+
+    return 0;
+}
+/**
+just win today.
+⠀⠀⠀⠀⠀⠀⠀⠀ ⠀⠀⠀⣠⣴⣶⣿⣿⣷⣶⣄⣀⣀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀ ⠀⠀⣰⣾⣿⣿⡿⢿⣿⣿⣿⣿⣿⣿⣿⣷⣦⡀⠀⠀
+⠀⠀⠀⠀⠀⠀ ⠀⢀⣾⣿⣿⡟⠁⣰⣿⣿⣿⡿⠿⠻⠿⣿⣿⣿⣿⣧
+⠀⠀⠀⠀⠀ ⠀⠀⣾⣿⣿⠏⠀⣴⣿⣿⣿⠉⠀⠀⠀⠀⠀⠈⢻⣿⣿⣇
+⠀⠀⠀⠀  ⣠⣼⣿⣿⡏⠀⢠⣿⣿⣿⠇⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿⣿⡀
+⠀⠀⠀ ⣰⣿⣿⣿⣿⣿⡇⠀⢸⣿⣿⣿⡀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⡇
+⠀⠀ ⢰⣿⣿⡿⣿⣿⣿⡇⠀⠘⣿⣿⣿⣧⠀⠀⠀⠀⠀⠀⢀⣸⣿⣿⣿⠁
+⠀  ⣿⣿⣿⠁⣿⣿⣿⡇⠀⠀⠻⣿⣿⣿⣷⣶⣶⣶⣶⣶⣿⣿⣿⣿⠃
+  ⢰⣿⣿⡇⠀⣿⣿⣿⠀⠀⠀⠀⠈⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠁⠀
+  ⢸⣿⣿⡇⠀⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠉⠛⠛⠛⠉⢉⣿⣿⠀⠀⠀⠀
+  ⢸⣿⣿⣇⠀⣿⣿⣿⠀⠀⠀⠀⠀⢀⣤⣤⣤⡀⠀⠀⢸⣿⣿⣿⣷⣦⠀
+   ⢻⣿⣿⣶⣿⣿⣿⠀⠀⠀⠀⠀⠈⠻⣿⣿⣿⣦⡀⠀⠉⠉⠻⣿⣿⡇
+     ⠛⠿⣿⣿⣿⣿⣷⣤⡀⠀⠀⠀⠀⠈⠹⣿⣿⣇⣀ ⣠⣾⣿⣿⡇
+          ⠹⣿⣿⣿⣿⣦⣤⣤⣤⣤⣾⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀
+              ⠉⠻⢿⣿⣿⣿⣿⣿⣿⠿⠋⠉⠛⠋⠉⠉⠁⠀
+⠀                 ⠈⠉⠉⠉⠁
+**/
