@@ -1,0 +1,85 @@
+#include <bits/stdc++.h>
+using namespace std;
+/**
+* IDEA:
+*/
+ 
+long long a[200005], BIT[400005],n,q;
+vector<pair<char,pair<long long,long long>>> Q;
+map<long long,long long> m;
+vector<long long> v;
+ 
+void ins(long long x){
+    if(m[x] == 0){
+        v.push_back(x);
+        m[x]++;
+    }
+}
+ 
+void update(long long i, long long val){
+    while(i <= 400000){
+        BIT[i] += val;
+        i += (i & -i);
+    }
+}
+ 
+long long get(long long i){
+    long long ans = 0;
+    while(i){
+        ans += BIT[i];
+        i -= (i & -i);
+    }
+    return ans;
+}
+ 
+int main() {
+    ios_base::sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
+ 
+    // freopen("main.inp","r",stdin);
+    // freopen("main.out","w",stdout);
+ 
+    cin>>n>>q;
+    
+    for(int i=1;i<=n;i++){
+        cin>>a[i];
+        ins(a[i]);
+    }
+ 
+    for(int i=1;i<=q;i++){
+        char c;
+        long long u,p;
+        cin>>c>>u>>p;       
+        Q.push_back({c, {u,p}});
+        if(c == '!'){
+            ins(p);
+        }
+    }
+    sort(v.begin(), v.end());
+ 
+    for(int i=1;i<=n;i++){
+        a[i] = upper_bound(v.begin(), v.end(), a[i]) - v.begin();
+        update(a[i], 1);
+    }
+ 
+    for(pair<char, pair<long long,long long>> p : Q){
+        char c = p.first;
+        if(c == '!'){
+            long long i = p.second.first;
+            long long val = upper_bound(v.begin(), v.end(), p.second.second) - v.begin();
+            update(a[i], -1);
+            a[i] = val;
+            update(a[i], 1);
+        }
+        else{
+            long long l = upper_bound(v.begin(), v.end(), p.second.first - 1) - v.begin();
+            long long r = upper_bound(v.begin(), v.end(), p.second.second) - v.begin();
+            l = get(l);
+            r = get(r);
+            cout<<r-l<<endl;
+        }
+    }
+ 
+    return 0;
+}
