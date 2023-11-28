@@ -1,0 +1,115 @@
+#include <bits/stdc++.h>
+using namespace std;
+/**
+* IDEA:
+*/
+
+long long n,m,k,q, vi[1005][1005], f[1005][1005], mod = 1e9;
+// int dx[4] = {-1, 1, 2, 2}; 
+// int dy[4] = {2, 2, 1, -1}; 
+int dx[4] = {1, -1, -2,-2};
+int dy[4] = {-2, -2, -1, 1};
+vector<pair<int, int>> gr[1005][1005];
+stack<pair<int,int>> st;
+deque<pair<int,int>> v;
+
+bool valid(int x, int y){
+    return (x >= 1 && x <= n && y >= 1 && y <= m);
+}
+
+void p(int x, int y){
+    for(int i=0;i<4;i++){
+        int u = x + dx[i];
+        int v = y + dy[i];
+        if(valid(u, v) && vi[u][v] == 0){
+            gr[x][y].push_back({u, v});
+        }
+    }
+}
+
+void dfs(int x, int y){
+    vi[x][y] = 1;
+    for(pair<int,int> p : gr[x][y]){
+        int u = p.first;
+        int v = p.second;
+        if(!vi[u][v]){
+            dfs(u, v);
+        }
+    }
+    st.push({x, y});
+    v.push_front({x, y});
+}
+
+int main() {
+    ios_base::sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
+
+    freopen("SOCACH.inp","r",stdin);
+    freopen("SOCACH.out","w",stdout);
+
+    cin>>n>>m>>k>>q;
+
+    while(k--){
+        int x,y;
+        cin>>x>>y;
+        vi[x][y] = 1;
+    }
+
+    for(int i=1;i<=n;i++){
+        for(int j=1;j<=m;j++){
+            if(vi[i][j]){
+                continue;
+            }
+            p(i, j);
+        }
+    }
+
+    for(int i=1;i<=n;i++){
+        for(int j=1;j<=m;j++){
+            if(!vi[i][j]){
+                dfs(i, j);
+            }
+        }
+    }
+
+    f[n][m] = 1;
+    for(pair<int,int> p : v){
+        int x = p.first;
+        int y = p.second;
+        if(f[x][y] > 0){
+            for(pair<int,int> pa : gr[x][y]){
+                int i = pa.first;
+                int j = pa.second;
+                f[i][j] = (f[i][j] + f[x][y]) % mod;
+            }
+        }
+    }
+
+    while(q--){
+        int x, y;
+        cin>>x>>y;
+        cout<<f[x][y]<<endl;
+    }
+
+    return 0;
+}
+/**
+just win today.
+⠀⠀⠀⠀⠀⠀⠀⠀ ⠀⠀⠀⣠⣴⣶⣿⣿⣷⣶⣄⣀⣀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀ ⠀⠀⣰⣾⣿⣿⡿⢿⣿⣿⣿⣿⣿⣿⣿⣷⣦⡀⠀⠀
+⠀⠀⠀⠀⠀⠀ ⠀⢀⣾⣿⣿⡟⠁⣰⣿⣿⣿⡿⠿⠻⠿⣿⣿⣿⣿⣧
+⠀⠀⠀⠀⠀ ⠀⠀⣾⣿⣿⠏⠀⣴⣿⣿⣿⠉⠀⠀⠀⠀⠀⠈⢻⣿⣿⣇
+⠀⠀⠀⠀  ⣠⣼⣿⣿⡏⠀⢠⣿⣿⣿⠇⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿⣿⡀
+⠀⠀⠀ ⣰⣿⣿⣿⣿⣿⡇⠀⢸⣿⣿⣿⡀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⡇
+⠀⠀ ⢰⣿⣿⡿⣿⣿⣿⡇⠀⠘⣿⣿⣿⣧⠀⠀⠀⠀⠀⠀⢀⣸⣿⣿⣿⠁
+⠀  ⣿⣿⣿⠁⣿⣿⣿⡇⠀⠀⠻⣿⣿⣿⣷⣶⣶⣶⣶⣶⣿⣿⣿⣿⠃
+  ⢰⣿⣿⡇⠀⣿⣿⣿⠀⠀⠀⠀⠈⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠁⠀
+  ⢸⣿⣿⡇⠀⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠉⠛⠛⠛⠉⢉⣿⣿⠀⠀⠀⠀
+  ⢸⣿⣿⣇⠀⣿⣿⣿⠀⠀⠀⠀⠀⢀⣤⣤⣤⡀⠀⠀⢸⣿⣿⣿⣷⣦⠀
+   ⢻⣿⣿⣶⣿⣿⣿⠀⠀⠀⠀⠀⠈⠻⣿⣿⣿⣦⡀⠀⠉⠉⠻⣿⣿⡇
+     ⠛⠿⣿⣿⣿⣿⣷⣤⡀⠀⠀⠀⠀⠈⠹⣿⣿⣇⣀ ⣠⣾⣿⣿⡇
+          ⠹⣿⣿⣿⣿⣦⣤⣤⣤⣤⣾⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀
+              ⠉⠻⢿⣿⣿⣿⣿⣿⣿⠿⠋⠉⠛⠋⠉⠉⠁⠀
+⠀                 ⠈⠉⠉⠉⠁
+**/
