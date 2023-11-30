@@ -1,40 +1,34 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-long long tree[4*100000], a[100000];
-pair<long long,long long> lazy[4*100000];
+long long tree[4*100000], a[100000], lazy[4*100000];
 
 void propagate(int id, int l, int r){
-    if(lazy[id].first == -1){
+    if(!lazy[id]){
         return;
     }
 
-    tree[id] = lazy[id].first * (r - l + 1);
+    tree[id] = (lazy[id]-1) * (r - l + 1);
     if(l != r){
-        if(lazy[2*id].second < lazy[id].second){
-            lazy[2*id] = lazy[id];
-        }
-        if(lazy[2*id+1].second < lazy[id].second){
-            lazy[2*id+1] = lazy[id];
-        }
+        lazy[id<<1] = lazy[id<<1|1] = lazy[id];
     }
-    lazy[id] = {-1,0};
+    lazy[id] = 0;
 }
 
-void update(int id, int l, int r, int u, int v, int val, int ind){
+void update(int id, int l, int r, int u, int v, int val){
     propagate(id,l,r);
 
     if(r < u || l > v){
         return;
     }
     if(u <= l && r <= v){
-        lazy[id] = {val,ind};
+        lazy[id] = val+1;
         propagate(id,l,r);
         return;
     }
     int mid = l+r >> 1;
-    update(2*id,l,mid,u,v,val,ind);
-    update(2*id+1,mid+1,r,u,v,val,ind);
+    update(2*id,l,mid,u,v,val);
+    update(2*id+1,mid+1,r,u,v,val);
 
     tree[id] = tree[2*id] + tree[2*id+1];
 }
@@ -59,7 +53,7 @@ int main() {
     int n,m,ind=1;
     cin>>n>>m;
 
-    fill(lazy,lazy+100000,make_pair(-1,0));
+    fill(lazy,lazy+100000,0);
 
     while(m--){     
         int task;
@@ -68,7 +62,7 @@ int main() {
             int l,r,v;
             cin>>l>>r>>v;
             l++;
-            update(1,1,n,l,r,v,ind++);
+            update(1,1,n,l,r,v);
         }
         else{
             int l,r;
