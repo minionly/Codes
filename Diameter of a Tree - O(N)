@@ -1,0 +1,92 @@
+#include <bits/stdc++.h>
+using namespace std;
+#define endl '\n' 
+/**
+* IDEA:
+*/
+
+const long long lim  = 2e5 + 5;
+vector<int> gr[lim];
+long long d[lim]; //diameter passing through i-th node
+long long path[lim]; //longest path rooted at i-th node
+
+void dfs(int s, int p){ //find longest path rooting at each node
+    long long ans = 0;
+    bool f = 0;
+
+    for(int i : gr[s]){
+        if(i != p){
+            f = 1;
+            dfs(i, s);
+            ans = max(ans, path[i]);
+        }
+    }
+    path[s] = ans + f;
+}
+
+void dfs2(int s, int p){ //find longest diameter passing through each node
+    vector<long long> v;
+    for(int i : gr[s]){
+        if(i != p){
+            dfs2(i, s);
+            v.push_back(path[i]);
+            d[s] = max(d[s], d[i]); 
+            //since i is connected to s, we consider the diameter of i as one possible answer.
+        }
+    }
+    sort(v.begin(), v.end(), greater<int>());
+    if(v.size() == 0){
+        d[s] = 0;
+    }
+    else if(v.size() == 1){
+        d[s] = max(d[s], v[0] + 1);
+    }
+    else{
+        d[s] = max(d[s], v[0] + v[1] + 2);
+    }
+}
+
+int main() {
+    ios_base::sync_with_stdio(0);
+    cin.tie(0);
+    cout.tie(0);
+
+    // freopen("main.inp","r",stdin);
+    // freopen("main.out","w",stdout);
+
+    int n;
+
+    cin>>n;
+
+    for(int i=1;i<n;++i){
+        int u, v;
+        cin>>u>>v;
+        gr[u].push_back(v);
+        gr[v].push_back(u);
+    }
+
+    dfs(1, 0);
+    dfs2(1, 0);
+    cout<<d[1];
+
+    return 0;
+}
+/**
+just win today.
+⠀⠀⠀⠀⠀⠀⠀⠀ ⠀⠀⠀⣠⣴⣶⣿⣿⣷⣶⣄⣀⣀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀ ⠀⠀⣰⣾⣿⣿⡿⢿⣿⣿⣿⣿⣿⣿⣿⣷⣦⡀⠀⠀
+⠀⠀⠀⠀⠀⠀ ⠀⢀⣾⣿⣿⡟⠁⣰⣿⣿⣿⡿⠿⠻⠿⣿⣿⣿⣿⣧
+⠀⠀⠀⠀⠀ ⠀⠀⣾⣿⣿⠏⠀⣴⣿⣿⣿⠉⠀⠀⠀⠀⠀⠈⢻⣿⣿⣇
+⠀⠀⠀⠀  ⣠⣼⣿⣿⡏⠀⢠⣿⣿⣿⠇⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿⣿⡀
+⠀⠀⠀ ⣰⣿⣿⣿⣿⣿⡇⠀⢸⣿⣿⣿⡀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⡇
+⠀⠀ ⢰⣿⣿⡿⣿⣿⣿⡇⠀⠘⣿⣿⣿⣧⠀⠀⠀⠀⠀⠀⢀⣸⣿⣿⣿⠁
+⠀  ⣿⣿⣿⠁⣿⣿⣿⡇⠀⠀⠻⣿⣿⣿⣷⣶⣶⣶⣶⣶⣿⣿⣿⣿⠃
+  ⢰⣿⣿⡇⠀⣿⣿⣿⠀⠀⠀⠀⠈⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠁⠀
+  ⢸⣿⣿⡇⠀⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠉⠛⠛⠛⠉⢉⣿⣿⠀⠀⠀⠀
+  ⢸⣿⣿⣇⠀⣿⣿⣿⠀⠀⠀⠀⠀⢀⣤⣤⣤⡀⠀⠀⢸⣿⣿⣿⣷⣦⠀
+   ⢻⣿⣿⣶⣿⣿⣿⠀⠀⠀⠀⠀⠈⠻⣿⣿⣿⣦⡀⠀⠉⠉⠻⣿⣿⡇
+     ⠛⠿⣿⣿⣿⣿⣷⣤⡀⠀⠀⠀⠀⠈⠹⣿⣿⣇⣀ ⣠⣾⣿⣿⡇
+          ⠹⣿⣿⣿⣿⣦⣤⣤⣤⣤⣾⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀
+              ⠉⠻⢿⣿⣿⣿⣿⣿⣿⠿⠋⠉⠛⠋⠉⠉⠁⠀
+⠀                 ⠈⠉⠉⠉⠁
+**/
