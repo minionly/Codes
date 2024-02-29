@@ -1,80 +1,98 @@
+/**
+ * @file main.cpp
+ * @author tnknguyen_ (nguyenngockhoitran@gmail.com)
+ * @date 30-08-2023
+ * 
+ * @copyright Copyright (c) 2023
+ * https://oj.vnoi.info/problem/gss
+ */
 #include <bits/stdc++.h>
 using namespace std;
 
-//^ construct a node for the nodes
 struct node{
     long long pre,suf,sum,max_sum;
     static node merge(node a, node b){
         node n;
-        n.pre = max(a.pre,a.sum + b.pre); 
-        n.suf = max(b.suf,b.sum + a.suf);
+        n.pre = max(a.pre,a.sum + b.pre);
+        n.suf = max(b.suf, b.sum + a.suf);
         n.sum = a.sum + b.sum;
         n.max_sum = max(a.suf + b.pre, max(a.max_sum,b.max_sum));
 
         return n;
-    }   
+    }
 };
 
-long long a[100000];
-node tree[4*100000];
+long long a[50005];
+node tree[4*50000];
 
-void build(int id,int l,int r){
+void build(long long id, long long l, long long r){
     if(l == r){
         tree[id] = {a[l],a[l],a[l],a[l]};
         return;
     }
-
-    int mid = l+r >> 1;
+    long long mid = l + r >> 1;
     build(2*id,l,mid);
     build(2*id+1,mid+1,r);
 
     tree[id] = node::merge(tree[2*id],tree[2*id+1]);
 }
 
-void update(int id,int l,int r,int i,int val){
-    if(i <l || i > r){
-        return;
+node get(long long id, long long l, long long r, long long u, long long v){
+    if(v < l || u > r){
+        return {INT_MIN, INT_MIN, INT_MIN, INT_MIN};
     }
-    if(l == r){
-        tree[id] = {val,val,val,val};
-        return;
+    if(u <= l && r <= v){
+        return tree[id];
     }
+    long long mid = l + r >> 1;
+    node g1 = get(2*id,l,mid,u,v);
+    node g2 = get(2*id+1,mid+1,r,u,v);
+    node ans = node::merge(g1, g2);
 
-    int mid = l+r >> 1;
-    update(2*id,l,mid,i,val);
-    update(2*id+1,mid+1,r,i,val);
-
-    tree[id] = node::merge(tree[2*id],tree[2*id+1]);
+    return ans;
 }
 
 int main() {
     ios_base::sync_with_stdio(0);
     cin.tie(0);
     cout.tie(0);
-
-    // freopen("P2S1.inp","r",stdin);
-    // freopen("P2S1.out","w",stdout);
-
-    int n,m,i,v;
-
-    //TODO: place value v into index i and return max sum of sub_segment
     
-    cin>>n>>m;
+    freopen("test.inp","r",stdin);
+    freopen("test.out","w",stdout);
+    
+    long long n,m;
 
-    for(int i=1;i<=n;i++){
+    cin>>n;
+    for(long long i=1;i<=n;i++){
         cin>>a[i];
     }
-
     build(1,1,n);
 
-    cout<<max((long long)0,tree[1].max_sum)<<endl;
+    cin>>m;
 
     while(m--){
-        cin>>i>>v;
-        i++;
-        update(1,1,n,i,v);
-        cout<<max((long long)0,tree[1].max_sum)<<endl;
+        long long u,v;
+        cin>>u>>v;
+        cout<<get(1,1,n,u,v).max_sum<<endl;
     }
 
     return 0;
 }
+/**
+⠀⠀⠀⠀⠀⠀⠀⠀ ⠀⠀⠀⣠⣴⣶⣿⣿⣷⣶⣄⣀⣀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀ ⠀⠀⣰⣾⣿⣿⡿⢿⣿⣿⣿⣿⣿⣿⣿⣷⣦⡀⠀⠀
+⠀⠀⠀⠀⠀⠀ ⠀⢀⣾⣿⣿⡟⠁⣰⣿⣿⣿⡿⠿⠻⠿⣿⣿⣿⣿⣧
+⠀⠀⠀⠀⠀ ⠀⠀⣾⣿⣿⠏⠀⣴⣿⣿⣿⠉⠀⠀⠀⠀⠀⠈⢻⣿⣿⣇
+⠀⠀⠀⠀  ⣠⣼⣿⣿⡏⠀⢠⣿⣿⣿⠇⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿⣿⡀
+⠀⠀⠀ ⣰⣿⣿⣿⣿⣿⡇⠀⢸⣿⣿⣿⡀⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⣿⡇
+⠀⠀ ⢰⣿⣿⡿⣿⣿⣿⡇⠀⠘⣿⣿⣿⣧⠀⠀⠀⠀⠀⠀⢀⣸⣿⣿⣿⠁
+⠀  ⣿⣿⣿⠁⣿⣿⣿⡇⠀⠀⠻⣿⣿⣿⣷⣶⣶⣶⣶⣶⣿⣿⣿⣿⠃
+  ⢰⣿⣿⡇⠀⣿⣿⣿⠀⠀⠀⠀⠈⠻⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠁⠀
+  ⢸⣿⣿⡇⠀⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠉⠛⠛⠛⠉⢉⣿⣿⠀⠀⠀⠀
+  ⢸⣿⣿⣇⠀⣿⣿⣿⠀⠀⠀⠀⠀⢀⣤⣤⣤⡀⠀⠀⢸⣿⣿⣿⣷⣦⠀
+   ⢻⣿⣿⣶⣿⣿⣿⠀⠀⠀⠀⠀⠈⠻⣿⣿⣿⣦⡀⠀⠉⠉⠻⣿⣿⡇
+     ⠛⠿⣿⣿⣿⣿⣷⣤⡀⠀⠀⠀⠀⠈⠹⣿⣿⣇⣀ ⣠⣾⣿⣿⡇
+          ⠹⣿⣿⣿⣿⣦⣤⣤⣤⣤⣾⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀
+              ⠉⠻⢿⣿⣿⣿⣿⣿⣿⠿⠋⠉⠛⠋⠉⠉⠁⠀
+⠀                 ⠈⠉⠉⠉⠁
+**/
